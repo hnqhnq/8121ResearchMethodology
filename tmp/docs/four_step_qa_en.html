@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Four Step Abstract QA</title>
+  <style>
+    @page { size: Letter portrait; margin: 1in; }
+    html, body { margin: 0; padding: 0; }
+    body { color: #000; font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 2; }
+    .title, h1 { margin: 0; text-align: center; font-size: 12pt; font-weight: 700; line-height: 2; }
+    .title { margin-bottom: 12pt; }
+    .abstract { margin: 0; text-align: justify; orphans: 2; widows: 2; }
+    .keywords { margin: 0; }
+  </style>
+</head>
+<body>
+  <p class="title">Threshold Gating and Information Disclosure in Observational Learning</p>
+  <h1>Abstract</h1>
+  <p class="abstract">Sequential financial markets rely on observational learning to aggregate dispersed information from prior actions. However, early noisy actions can generate inefficient information cascades, and disclosure rules vary in their ability to filter these signals. Existing research has not established when delaying the use of public information improves collective decisions or whether the effect depends on the disclosure regime. We therefore evaluate dual-threshold gating across four disclosure regimes and test whether its effects persist when large language models (LLMs) introduce behavioral heterogeneity. In an agent-based model, 3,000 groups per treatment contain ten sequential agents who receive binary private signals with 0.60 accuracy. We compare pure action observation (PAO), optional disclosure (OD), selective disclosure (SD), and incentivized optional disclosure (IOD). One threshold delays weak public signals; the other gives silence directional meaning only after public evidence is strong. Without gating, mean accuracy over the last five decisions is 0.888 under SD and 0.856 under IOD, compared with 0.753 under PAO and 0.660 under OD. Gating raises accuracy to 0.798 under PAO and 0.697 under OD by limiting early reliance on noisy public histories. Effects differ when disclosure already screens information: accuracy increases to 0.910 under SD but falls to 0.843 under IOD, revealing the cost of delaying useful signals. These patterns remain stable across random seeds, and sensitivity tests identify effective ranges of 2-3 for the public-information threshold and 2-4 for the silence threshold. LLM augmentation increases behavioral variation without changing the broad advantage of screened or incentivized disclosure. Threshold gating is therefore a targeted corrective for weak information environments rather than a universal addition to disclosure rules. Effective design requires matching information-use thresholds to the screening capacity of the underlying disclosure regime.</p>
+  <p class="keywords"><strong>Keywords: </strong>Observational learning; Information disclosure; Threshold gating; Information cascades; Agent-based simulation; Large language models</p>
+</body>
+</html>

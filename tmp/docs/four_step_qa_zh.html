@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>四步结构摘要中文对照排版检查</title>
+  <style>
+    @page { size: Letter portrait; margin: 1in; }
+    html, body { margin: 0; padding: 0; }
+    body { color: #000; font-family: "Songti SC", "SimSun", serif; font-size: 12pt; line-height: 2; }
+    .title, h1 { margin: 0; text-align: center; font-size: 12pt; font-weight: 700; line-height: 2; }
+    .title { margin-bottom: 12pt; }
+    .abstract { margin: 0; text-align: justify; orphans: 2; widows: 2; }
+    .keywords { margin: 0; }
+  </style>
+</head>
+<body>
+  <p class="title">观察性学习中的信息披露阈值门控</p>
+  <h1>摘要</h1>
+  <p class="abstract">顺序金融市场依靠观察性学习，从前序行为中汇聚分散信息。然而，早期噪声行为可能引发低效的信息级联，而不同披露规则筛选此类信息的能力并不相同。既有研究尚未明确，延迟使用公共信息在何种条件下能够改善群体决策，以及其作用是否取决于既有披露制度。因此，本文评估双阈值门控机制在四种披露制度下的效果，并检验在大语言模型（LLM）引入行为异质性后，这些效果是否仍然成立。研究采用基于智能体的模型，每种处理模拟3000个实验组；每组包含10名顺序决策的智能体，个体接收准确率为0.60的二元私人信号。模型比较仅观察行为（PAO）、可选披露（OD）、选择性披露（SD）和激励型可选披露（IOD）四种制度。一个阈值延迟弱公共信号的使用，另一个阈值仅在公共证据较强时赋予沉默行为方向性含义。未引入门控时，决策序列后5位的平均准确率在SD和IOD下分别为0.888和0.856，高于PAO的0.753和OD的0.660。阈值门控通过限制个体在早期对含噪公共历史的依赖，将PAO的准确率提高至0.798，将OD提高至0.697。当披露制度已能筛选信息时，门控效果存在差异：SD的准确率提高至0.910，而IOD下降至0.843，表明延迟有效信号会产生效率成本。上述结果在不同随机种子下保持稳定；敏感性检验显示，公共信息使用阈值的有效区间为2至3，沉默解释阈值为2至4。LLM增强仿真增加了行为差异，但未改变筛选型或激励型披露制度的总体优势。因此，阈值门控是针对信息质量较弱环境的纠偏工具，而非适用于所有披露制度的通用叠加规则。有效的制度设计应使信息使用阈值与既有披露制度的信息筛选能力相匹配。</p>
+  <p class="keywords"><strong>关键词：</strong>观察性学习；信息披露；阈值门控；信息级联；智能体仿真；大语言模型</p>
+</body>
+</html>
