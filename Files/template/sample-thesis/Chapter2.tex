@@ -1,0 +1,85 @@
+\newglossaryentry{CPP}{name={\CPP}, description={{\CPP} programming language}}
+\newglossaryentry{OODB}{name={\OODB}, description={object-oriented database}}
+\newglossaryentry{RDF}{name={\RDF}, description={resource description framework}}
+\newglossaryentry{SPARQL}{name={\SPARQL}, description={{\SPARQL} protocol and {\RDF} query language}}
+
+\chapter{Related Work}\label{ch:related}
+\minitoc
+
+\section[Pattern Matching in OOP]{Pattern Matching in Object Oriented Programming}
+
+Besides Scala, there have been many attempts to promote pattern matching in {\OO} programs.
+Because the complexity and multi-paradigm trend of {\OO} languages, a one-for-all solution is difficult.
+These attempts each have their own focuses.
+\Etal{Geller}, in a full-length technical report~\cite{geller2010pattern},
+proposed a pattern matching framework in a purely {\OO} style for a dynamic typed language: Newspeak, one of the Smalltalk family.
+Patterns are like normal objects that receive messages to perform the matching operations.
+This proposal focuses on providing a framework for pattern messaging and pattern combinators, such as conjunction, disjunction, sequencing and negation,
+as well as the building blocks for structural matching, such as value literals and attribute keywords.
+How to match a pattern is left abstract and subject to individual object implementations.
+\Etal{Widemann}~\cite{y2012paisley} similarly provided a framework in a library approach requiring generics,
+that focused on the interfaces and protocols to match patterns against, extract components from and binding variables to objects.
+Conjunction and disjunction are also supported through the ``both'' and ``either'' combinators.
+Again, how objects and components match patterns is still abstract and therefore shallow to an object.
+
+\Etal{Solodkyy}~\cite{solodkyy2013open} proposed an efficient functional-style pattern matching for \gls{CPP} as a library,
+making heavy use of {\CPP} \emph{concepts} and template metaprogramming.
+A particular pattern is expressed as a template instantiation, and the properties specific to that pattern are constructed at compile-time.
+Plus the smart use of virtual table pointers as type identifiers for hashing, this gives very minimal performance overhead to the extension.
+Although {\CPP} extensively supports pointers and references, but the structures are of value semantics.
+This library is not specific to pointer structures.
+\Etal{Ryu}~\cite{ryu2010adding} provided an language extension to Fortress, an experimental language with {\OO} perspective.
+The extension depends on the \emph{getters} of an object to match its components,
+and focuses on run-time type tests and multimethods.
+The fashion of multimethods~\cite{muschevici2008multiple} is a strong application of pattern matching in functional languages,
+and it has been extensively studied in {\OO} languages in the contrast to the single-dispatch dominance~\cite{chambers1992object,ernst1998predicate,clifton2006multijava}.
+
+Even a bold experiment was carried out in early days by \Etal{Liu}~\cite{liu2003jmatch} in their JMatch extension to Java.
+It generalizes functions and operations to be able to find the arguments back from the results, by introducing the forward and \emph{backward} modes,
+including automatic iteration to search for elements in a collection.
+This is more aggressive than the explicit extractors in Scala to decompose objects, with some level of operation inference.
+\Etal{Emir}~\cite{emir2007matching} gave a thorough review of the commonly adopted {\OO} pattern matching techniques,
+including object decomposition, visitors, type tests, typecase, case classes and extractors.
+All these techniques are currently available in Scala.
+\Etal{Kohn}~\cite{kohn2020dynamic} proposed a complete solution of pattern matching to the dynamically typed Python language.
+It lives with the existing Python so well that it will greatly simplify the style of future Python code.
+This extension has been included in the official Python 3.10~\cite{bucher2020PEP634,kohn2020PEP635},
+and is thus far the most powerful algebraic pattern matching implementation in the {\OO} world.
+Finally, {\OO} pattern matching is widely accepted, not only in Scala and Python,
+it will appear in Java~16~\cite{bierman2020JEP394} and {\Csharp}~8~\cite{microsoft2020csharp},
+the two most popular production {\OO} languages.
+
+\section{Graph-Based Formalism}
+
+While most research on {\OO} pattern matching all has focused on type tests and object decomposition in various abstract ways that
+coexist with the {\OO} paradigm, with purposes to enhance type safety, expressiveness and conciseness,
+the pointer structures of the data models in {\OO} programs are also of interest.
+The semantics of a program must eventually relies on how the data objects are represented~\cite{gunter1992semantics}.
+Bornat~\cite{bornat2000pointer} showed three example proofs of pointer programs in Hoare Logic, with treatment of pointer aliasing
+by the principle of \emph{spatial separation}. Although the mechanism remains rather low-level, it achieved a level of local reasoning on particular data structures.
+\Etal{Ke}~\cite{ke2009graph} gave a small-step operational semantics of {\OO} programs based on class, object and state graphs.
+It presents a formal graph model for full featured {\OO} constructs, including stacks and method frames.
+\Etal{Ke}~\cite{ke2013graph} further extended the graph model to a generic type system,
+to handle recursive types, type variables and type instantiations in the notions of graph morphisms and transformations.
+\Etal{Zhao}~\cite{zhao2009graph} employed the transformation of class and object graphs in the refinement of {\OO} data structures,
+investigating what changes of patterns in the class structure maintained the capability of providing functionalities or services.
+\Etal{Zhao}~\cite{zhao2013graph} proposed a graph-based Hoare Logic for reasoning about {\OO} programs.
+The Hoare proof system consists of a set of logic rules covering most {\OO} constructs, including object creation, local variable declaration and recursive method invocation.
+The soundness of the logic is given, that every specification proved by the system is valid. There wasn't a proof of completeness, although the logic is believed complete.
+
+\section{Graph Pattern Matching}
+
+Besides the formulation of classes and objects, graphs are widely used in the abstraction of other language notions involving relations, such as query languages.
+\Etal{Francis}~\cite{francis2018cypher} described the Cypher~9 query language of the Neo4j graph database.
+Cypher's core data model consists of values, property graphs and tables.
+The path patterns in the query language is quite similar to the objects in {\OO} languages,
+where the nodes are entity patterns like types, and the edges are relations between entities like attributes.
+Formal semantics is given for the core query language based on the pattern matching.
+\Etal{Tong}~\cite{tong2018mapping} proposed an approach for mapping {\OO} database models into the resource description framework (\gls{RDF}).
+This work gives the formal definitions of {\OO} databases and {\RDF}, and maps the query language of {\OODB} to the \gls{SPARQL} query of {\RDF} based on graph patterns.
+\Etal{Li}~\cite{li2017relaxing} defined taxonomy graphs and simulation admits the ``is-a'' relation similar to the {\OO} subtyping, but on edge labels rather than node types.
+By this ``is-a'' relation, pattern matching on edges is relaxed such that a descendant edge matches an ancestor edge, and the relaxation is bounded by an inheritance distance.
+Although the purpose of the relaxation was to capture more sensible matches in real-life complex data graphs,
+the idea can be applied to abstract relations between objects in {\OO} programs.
+
+\endinput

@@ -1,0 +1,15 @@
+\chapter{Conclusion}\label{ch:conclusion}
+
+We formalize pattern matching for {\OO} languages based on object graphs.
+Beyond the algebraic view of data objects found in functional languages, and the addition of type tests for {\OO} subtyping,
+we develop a pattern matching theory tackling the underlying pointer structures of objects, in particular with the intention to examine aliases and cycles.
+We define the cover relation on layout graphs and the match relation on pattern graphs in terms of graph morphisms, and study the key properties.
+The theory is further expanded to incorporate match conjunction and disjunction, with more complex cases addressed.
+We design the language extension in the form of abstract syntax to specify the patterns and match operations.
+Key algorithms are given in detail to construct the pattern graph, match relation, conjunction and disjunction.
+We present the type-checking rules and operational semantics for the pattern matching extension.
+We give the soundness of the theory by proving the type safety theorem.
+This theory keeps the graphs and subtyping preorder abstract, thus sets a solid and general foundation for {\OO} pattern matching on pointer structures.
+Together with the discussion on limitations and potential solutions, this work is a reference base for future language design and improvement.
+
+\endinput

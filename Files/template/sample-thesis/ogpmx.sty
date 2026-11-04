@@ -1,0 +1,171 @@
+\ProvidesPackage{ogpmx}[2021/08/11]
+
+\RequirePackage{calrsfs}
+
+% ---- amsthm
+\newtheoremstyle{MyDefinition}% name of the style to be used
+  {\topsep}% measure of space to leave above the theorem. E.g.: 3pt
+  {\topsep}% measure of space to leave below the theorem. E.g.: 3pt
+  {}% name of font to use in the body of the theorem
+  {}% measure of space to indent
+  {\bfseries}% name of head font
+  {}% punctuation between head and body
+  {0.5em plus 0.75em}% space after theorem head; " " = normal interword space
+  {\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}% Manually specify head
+
+\theoremstyle{MyDefinition}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Definition}{Definition}
+\newtheorem{Example}{Example}
+\newtheorem{Exception}{Exceptional case}
+\newtheorem{Corollary}{Corollary}
+
+\def\Definitionautorefname{Definition}
+\def\Theoremautorefname{Theorem}
+\def\Corollaryautorefname{Corollary}
+\def\Lemmaautorefname{Lemma}
+
+\newcommand{\thsep}[1][1.5em]{\hspace{0pt plus #1}}
+
+% ---- algorithm2e
+\ifAlgoIIe
+\RestyleAlgo{ruled}
+\SetAlgoLined
+\LinesNumbered
+\newcommand{\myfuncsty}[1]{$\mathsf{#1}$}
+\SetFuncSty{myfuncsty}
+\SetKwFunction{KwFun}{function}
+\SetKwProg{Fn}{function}{ begin}{end}
+\SetKw{KwRaise}{raise}
+\SetKwIF{IRaise}{IElseRaise}{IElseDo}{raise}{if}{else raise}{else do}{end raise}
+\SetKwInput{KwEx}{Exception}
+\fi
+
+% ---- tikz
+\RequirePackage{pgf}
+\RequirePackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{arrows,decorations.pathmorphing}
+\usetikzlibrary{shapes.geometric}
+
+\tikzstyle{default}=[->, >=stealth', semithick, x=12pt, y=12pt, baseline=0pt]
+\tikzstyle{normht}=[text height=1.5ex,text depth=.25ex]
+\tikzstyle{nvertex}=[inner sep=2pt,normht]
+\tikzstyle{vertex}=[circle,inner sep=0pt,outer sep=1.5pt,minimum size=3.25pt,draw=black,fill=black]
+\tikzstyle{root}=[isosceles triangle,
+  isosceles triangle apex angle=60,
+  draw,
+  rotate=270,
+  inner sep=0pt,outer sep=1.5pt,minimum size=3.5pt,draw=black,fill=black]
+%\tikzstyle{var}=[<-,decorate,decoration={snake,amplitude=0.5pt,segment length=3pt,pre length=5pt,post length=1.5pt}]
+\tikzstyle{var}=[to-]
+
+% ---- text macros ----
+
+\newcommand{\DFS}{{\sc dfs}}
+\newcommand{\OO}{{\sc oo}}
+\newcommand{\OODB}{{\sc oodb}}
+\newcommand{\RDF}{{\sc rdf}}
+\newcommand{\SPARQL}{{\sc sparql}}
+\newcommand{\CPP}{\mbox{\sc c{\small\hspace{-.225ex}+\hspace{-.225ex}+}}}
+\newcommand{\Csharp}{\mbox{C{\tt\#}}}
+
+\newcommand{\Etal}[1]{#1 {\it et al.}}
+
+% ---- math macros ----
+
+\mathchardef\mhyphen="2D
+
+\newcommand{\mgls}[1]{\mbox{\gls{#1}}}
+\newcommand{\AsOp}{\mathbin{\scalebox{0.8}{\MVAt}}}
+
+\newcommand{\orr}{\mathrel{\mid}}
+\newcommand{\vect}[1]{\mathord{\langle#1\rangle}}
+\newcommand{\sett}[1]{\mathord{\{#1\}}}
+\newcommand{\lstt}[1]{\mathord{[#1]}}
+\newcommand{\syn}[1]{\text{\guillemetleft}\mkern2mu#1\text{\guillemetright}}
+
+\newcommand{\AllNodes}{\mathcal{N}}
+\newcommand{\AllLabels}{\mathcal{A}}
+\newcommand{\AllClasses}{\mathcal{C}}
+\newcommand{\AllValues}{\mathcal{V}}
+
+\newcommand{\Mismatch}{\mathit{Mismatch}}
+\newcommand{\NoConj}{\mathit{No\mhyphen Conj}}
+\newcommand{\NoUnion}{\mathit{No\mhyphen Union}}
+\newcommand{\SynUndefRef}{\mathit{Undef\mhyphen Ref}}
+\newcommand{\SynRedefRef}{\mathit{Redef\mhyphen Ref}}
+\newcommand{\NoType}{\mathit{No\mhyphen Type}}
+\newcommand{\Br}{\mathit{Branch}}
+\newcommand{\Lf}{\mathit{Leaf}}
+
+\newcommand{\Env}{\Gamma}
+\newcommand{\Sta}{\Sigma}
+\newcommand{\mb}{\mathsf{match}}
+\newcommand{\atype}{\mathsf{type}}
+\newcommand{\nvalue}{\mathsf{value}}
+
+\newcommand{\Var}{\mathbf{var}}
+\newcommand{\EndV}{\mathbf{end}}
+
+\newcommand{\la}[1]{\xrightarrow{#1}}
+\newcommand{\lb}[1]{\xrightarrow[#1]{}}
+\newcommand{\las}[1][]{\def\temp{#1}\ifx\temp\empty\mathrel{\mathord{\rightarrow}^\ast}\else\mathrel{\mathord{\xrightarrow{#1}}^\ast}\fi}
+\newcommand{\rrt}{\mathbin{\odot}}
+\newcommand{\gsub}{\smallsetminus}
+\newcommand{\suchthat}{\bullet}
+
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\ran}{ran}
+\DeclareMathOperator{\Root}{root}
+\DeclareMathOperator{\Nodes}{nodes}
+\DeclareMathOperator{\Edges}{edges}
+\DeclareMathOperator{\eval}{eval}
+\DeclareMathOperator{\Elem}{elements}
+
+\newcommand{\subty}{\prec}
+\newcommand{\nsubty}{\nprec}
+\newcommand{\supty}{\succ}
+\newcommand{\proj}[1]{\mathord{\mid_{#1}}}
+\newcommand{\gmat}[1][]{\def\temp{#1}\ifx\temp\empty\sqsubset\else\mathrel{\sqsubset_{#1}}\fi}
+\newcommand{\ngmat}{\nsqsubset}
+\newcommand{\gmatord}[2][]{\def\temp{#1}\ifx\temp\empty\sqsubset\mid_{#2}\else\mathrel{\sqsubset_{#1}\mid_{#2}}\fi}
+\newcommand{\isa}{\mathrel{\relbar\joinrel\mathrel\rhd}}
+\newcommand{\qdef}{\triangleq}
+\newcommand{\ginter}{\cap}
+\newcommand{\bginter}{\mathord{\textstyle\bigcap}}
+\newcommand{\gunion}{\cup}
+\newcommand{\bgunion}{\mathord{\textstyle\bigcup}}
+\newcommand{\gconj}{\curlywedge}
+\newcommand{\gdisj}{\curlyvee}
+\newcommand{\bgconj}{\mathord{\textstyle\bigcurlywedge}}
+\newcommand{\bgdisj}{\mathord{\textstyle\bigcurlyvee}}
+\newcommand{\isoeq}[1][]{\def\temp{#1}\ifx\temp\empty\cong\else\mathrel{\cong_{#1}}\fi}
+\newcommand{\isosub}[1][]{\def\temp{#1}\ifx\temp\empty\lesssim\else\mathrel{\lesssim_{#1}}\fi}
+\newcommand{\covers}[1][]{\def\temp{#1}\ifx\temp\empty\gtrsim\else\mathrel{\gtrsim_{#1}}\fi}
+\newcommand{\ov}[1]{#1_{\mathord{\circ}}}
+\newcommand{\co}[1]{#1_{\mathord{\diamond}}}
+\newcommand{\gda}[1][]{\def\temp{#1}\ifx\temp\empty\rightrightarrows\else\mathrel{\rightrightarrows_{#1}}\fi}
+\newcommand{\cceq}{\mathrel{\mathrel{\mathop:}\mathrel{\mathop:}=}}
+\newcommand{\redto}{\Rightarrow}
+\newcommand{\xt}{;\;}
+\newcommand{\bnchoice}{\mathord{\textstyle\bigsqcap}}
+\newcommand{\nchoice}{\sqcap}
+
+\newcounter{RepNum}
+\newcommand{\OlfX}[1]{%
+  \setcounter{RepNum}{#1}
+  \ifnum\value{RepNum}=0%
+    {f}%
+  \else%
+    \addtocounter{RepNum}{-1}%
+    \overline{\OlfX{\theRepNum}}%
+  \fi}
+\newcommand{\Olf}[1]{\vphantom{\OlfX{#1}}}
+
+\newcommand{\inferrulel}[3][]{\inferrule*[left=#1,vcenter]{#2}{#3}}
+
+% ---- last settings ----
+
+\endinput

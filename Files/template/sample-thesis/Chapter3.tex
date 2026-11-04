@@ -1,0 +1,632 @@
+\newglossaryentry{N}{name={$N$}, description={the set of nodes in a graph}}
+\newglossaryentry{E}{name={$E$}, description={the set of edges in a graph}}
+\newglossaryentry{G}{name={$G$}, description={a graph}}
+\newglossaryentry{AllNodes}{name={$\AllNodes$}, description={the alphabet of graph nodes}}
+\newglossaryentry{AllLabels}{name={$\AllLabels$}, description={the alphabet of graph edge labels}}
+\newglossaryentry{rrt}{name={$\rrt$}, description={re-rooting operation}}
+\newglossaryentry{laa}{name={$\la{a}$}, description={an edge with label $a$}}
+\newglossaryentry{las}{name={$\las$}, description={a path, possibly empty, leading to}}
+\newglossaryentry{isoeqf}{name={$\isoeq[f]$}, description={isomorphic to, under bijective function $f$}}
+\newglossaryentry{coversf}{name={$\covers[f]$}, description={covering, under graph isomorphism $f$}}
+\newglossaryentry{gmatf}{name={$\gmat[f]$}, description={matching, under graph isomorphism $f$}}
+\newglossaryentry{gdaf}{name={$\gda[f]$}, description={de-aliased from, under total function $f$}}
+\newglossaryentry{coversgda}{name={$\covers\gda$}, description={covering de-aliased graph of}}
+\newglossaryentry{isosubgda}{name={$\isosub\gda$}, description={covered by de-aliased graph of}}
+\newglossaryentry{isa}{name={$\isa$}, description={subclass of, is-a}}
+\newglossaryentry{subty}{name={$\subty$}, description={subtype of, preorder}}
+\newglossaryentry{bgconj}{name={$\bgconj$}, description={graph conjunction}}
+\newglossaryentry{bgdisj}{name={$\bgdisj$}, description={graph disjunction}}
+\newglossaryentry{AllClasses}{name={$\AllClasses$}, description={the alphabet of classes}}
+\newglossaryentry{AllValues}{name={$\AllValues$}, description={the alphabet of values}}
+\newglossaryentry{DFS}{name={\DFS}, description={depth-first search}}
+
+\chapter{Pattern Graphs and Match Relation}\label{ch:graph}
+\minitoc
+
+We first give the formal definitions of graphs, operations, morphisms and relations.
+We begin with the basic layout graphs consisting of only nodes and edges, and the match relation w.r.t. to a given preorder.
+Then, we add type assignments to the layout graphs to form the pattern graphs, and describe how to encode program states as graphs.
+We further expand the theory to match conjunction and disjunction, discuss the restriction and provide our resolution.
+
+\section{Layout Graphs}
+
+Let $\AllNodes$ be the set of all nodes, which can be any unique entities, usually associated with types, values and objects, and
+$\AllLabels$ the set of all labels, which are usually variable names. We define the layout graphs on these elements.
+
+\begin{Definition}[Layout Graph]
+A layout graph $\mgls{G} = \vect{\mgls{N}, \mgls{E}, p}$ is an edge-labeled, rooted and directed graph, where
+\begin{enumerate}
+\item $\Nodes(G) = N \subset \mgls{AllNodes}$ is the set of nodes,
+
+\item $\Edges(G) = E: N \to \mgls{AllLabels} \to N$ is a partial function, in infix notation, representing the edges, mapping the source node and the label to the target node, and
+
+\item $\Root(G) = p \in N$ is the root, and all the nodes are connected to $p$, $\forall u \in N \bullet \exists \overline{a} \bullet p \overline{E a} = u$.\footnote{%
+The overline $\overline{a}$ notation represents a series $a_1,\dots,a_n$ of items.
+However, an variable $E$ bound in the context, if overlined, repeats itself rather than expands into a series,
+thus $\overline{Ea}$ expands to $Ea_1Ea_2 \dots Ea_n$.}
+\end{enumerate}
+\end{Definition}
+
+We formulate the edges in a layout graph as a \emph{curried} function to imply that the outgoing edges from a node must have unique labels.
+We write, more intuitively, $u \mathrel{\mgls{laa}} v \in E$ to denote an edge $u E a = v$.
+Also, $u \mathrel{\mgls{las}} v \in E$ denotes there exists a path from $u$ to $v$, including single-node paths.
+
+A layout graph represents the layout of an object, where the root becomes the origin.
+Other nodes of a layout graph are the origins of object components,
+and each component is represented by the subgraph connecting to its origin.
+
+\begin{Definition}[Re-rooting]\label{def:reroot}
+Let $G = \vect{N,E,p}$ be a layout graph, and $p' \in N$.
+We say $G' = \vect{N',E',p'}$ is the subgraph re-rooted at node $p'$,
+denoted as $G' = G \mathbin{\mgls{rrt}} p'$, where
+\begin{enumerate}
+\item the nodes are connected to $p'$,
+\[
+N' = \sett{v \mid \exists p' \las v \in E},
+\]
+\item edges are restricted to the connected nodes, $E' = E \proj{N'}$.
+\end{enumerate}
+\end{Definition}
+
+Because there may be circular paths going back to the root,
+re-rooting cannot guarantee a \emph{proper} subgraph.
+Therefore, it does not necessarily imply a proper reduction.
+We must explicitly remove all the incoming edges to the root, and examine the residue subgraph.
+We define the subtraction to remove some edges from a layout graph.
+
+\begin{Definition}[Subtraction]\label{def:gesub}
+Let $G = \vect{N,E,p}$ be a layout graph, and $X \subseteq E$ the edges to exclude.
+$G' = \vect{N',E',p}$ is the subtraction graph of $X$ from $G$,
+denoted as $G' = G \gsub X$, where
+\begin{enumerate}
+\item the nodes are connected via $I = E \gsub X$ to the root,
+\[
+N' = \sett{v \mid \exists p \las v \in I},
+\]
+\item edges are restricted to the connected nodes, $E' = I\proj{N'}$.
+\end{enumerate}
+\end{Definition}
+
+Since morphisms are functions on nodes, the subtraction gives us a way to break cycles in a graph
+for a proper reduction on the number of nodes through re-rooting.
+
+\section{Match Relation}
+
+The structural equivalence of two layout graphs is formalized as an isomorphism,
+which is a bijection preserving all the outgoing edges of a node.
+
+\begin{Definition}[Graph Isomorphism]\label{def:giso}
+Let $G = \vect{N,E,p}$ and $G' = \vect{N',E',p'}$ be two layout graphs.
+$G$ is isomorphic to $G'$, denoted as $G \mathrel{\mgls{isoeqf}} G'$,
+if there exists a bijective function $f: N \to N'$, such that
+\begin{enumerate}
+\item root maps to root, $f(p) = p'$, and
+
+\item edges are preserved, $u \la{a} v \in E \iff f(u) \la{a} f(v) \in E'$.
+\end{enumerate}
+If $G$ is isomorphic to a root-preserving subgraph $G''$ of $G'$, i.e., $\Root(G'') = \Root(G')$,
+we say $G'$ \emph{covers} $G$, denoted as  $G' \mathrel{\mgls{coversf}} G$ or $G \isosub[f] G'$.
+\end{Definition}
+
+\begin{figure}[t]
+	\centering
+	\begin{tikzpicture}[default,->,thick,x={(45:45pt)}, y={(160:40pt)}, z={(115:12pt)}]
+		\node[root] (r) at (0,0,0) {};
+		\node[vertex] (a) at (0,-2,0) {};
+		\node[vertex] (b) at (1,-1,0) {};
+		\node[vertex] (c) at (2,0,0) {};
+		\node[vertex] (d) at (2,-2,0) {};
+
+		\draw (r) .. controls +(-75:1) and +(105:1) .. node[below] {$x$} (a);
+		\draw (r) .. controls +(-30:0.75) and +(150:0.75) .. node[below,pos=0.7] {$y$} (b);
+		\draw (r) .. controls +(15:0.75) and +(150:0.5) .. node[above,pos=0.7] {$z$}(c);
+		\draw (b) .. controls +(-150:1) and +(30:0.75) .. node[right,pos=0.8] {$x$} (a);
+		\draw (b) .. controls +(-30:0.75) and +(150:0.75) .. node[below,pos=0.7] {$y$} (d);
+		\draw (c) .. controls +(-30:1) and +(30:1) .. node[right] {$z$} (c);
+
+		\node[root,Maroon] (r1) at (0,0,1) {};
+		\node[vertex,Maroon] (a1) at (0,-2,1) {};
+		\node[vertex,Maroon] (b1) at (1,-1,1) {};
+
+		\draw[Maroon] (r1) .. controls +(-75:1) and +(105:1) .. (a1);
+		\draw[Maroon] (r1) .. controls +(-30:0.75) and +(150:0.75) .. (b1);
+		\draw[Maroon] (b1) .. controls +(-150:1) and +(30:0.75) .. (a1);
+
+		\node[root,Orchid] (r2) at (0,0,2) {};
+		\node[vertex,Orchid] (b2) at (1,-1,2) {};
+		\node[vertex,Orchid] (c2) at (2,0,2) {};
+		\node[vertex,Orchid] (d2) at (2,-2,2) {};
+
+		\draw[Orchid] (r2) .. controls +(-30:0.75) and +(150:0.75) .. (b2);
+		\draw[Orchid] (r2) .. controls +(15:0.75) and +(150:0.5) .. (c2);
+		\draw[Orchid] (b2) .. controls +(-30:0.75) and +(150:0.75) .. (d2);
+		\node at ($(c2)+(0.5,0,0)$) {};
+		\useasboundingbox;
+		\draw[Orchid] (c2) .. controls +(-30:1) and +(30:1) .. (c2);
+
+		\draw[thin,-,MidnightBlue] (0,0,-2) -- (r);
+		\draw[thin,-,MidnightBlue] (r.center) -- (r1);
+		\draw[thin,-,MidnightBlue] (r1.center) -- (r2);
+		\draw[thin,-,MidnightBlue] (r2.center) -- (0,0,4);
+
+		\draw[thin,-,Periwinkle] (a.center) -- (a1);
+		\draw[thin,-,Periwinkle] (b.center) -- (b1);
+		\draw[thin,-,Periwinkle] (b1.center) -- (b2);
+		\draw[thin,-,Periwinkle] (c.center) -- (c2);
+		\draw[thin,-,Periwinkle] (d.center) -- (d2);
+	\end{tikzpicture}
+	\caption{Subgraph isomorphism and covering between layout graphs}\label{fig:subiso}
+\end{figure}
+
+\autoref{fig:subiso} illustrates the covering between layout graphs.
+An object not only has the layout, but also has a type.
+We associate the type of an object to the root of its layout graph through a type-assignment $\tau$.
+Suppose there is a preorder $\subty$ defined on these types, e.g., the subclass or subset relation.
+The type-assignment is there because nodes of graphs are unique, it's inconvenient to reason about ordering between nodes directly.
+We define the match relation $\gmat$ between two layout graphs.
+\begin{Definition}[Graph Match]\label{def:gmat}
+Let $G$ and $G'$ be two layout graphs, and $\mgls{subty}$ a preorder on $\ran(\tau)$.
+$G'$ matches $G$ w.r.t. $\subty$ under isomorphism $f$,
+denoted as $G' \gmatord[f]{\subty} G$, or simply $G' \mathrel{\mgls{gmatf}} G$ without ambiguity,
+if $G' \covers[f] G$, such that
+the preorder exists between the types of any pair of corresponding nodes, i.e., $\forall u \in N \bullet \tau(f(u)) \subty \tau(u)$.
+\end{Definition}
+
+The graph match is a cover relation restricted to the given preorder between the types of nodes.
+It is trivial to verify that the graph match $\gmat$ relation is reflexive.
+We can also prove that $\gmat$ is transitive.
+
+\begin{Theorem}
+The graph match $\gmat$ relation is a preorder.
+\end{Theorem}
+\begin{proof}
+Suppose $G' = \vect{N',E',p'} \gmat[f] G = \vect{N,E,p}$
+and $G'' = \vect{N'',E'',p''} \gmat[f'] G'$.
+We can verify
+\begin{enumerate}
+\item $f'(f(p)) = p''$,
+
+\item $u \la{a} v \in E \implies f'(f(u)) \la{a} f'(f(v)) \in E''$, and
+
+\item $\forall u \in N \bullet \tau(f'(f(u))) \subty \tau(u)$.
+\end{enumerate}
+Hence $G'' \gmat[f' \circ f] G$. The $\gmat$ relation is transitive.
+\end{proof}
+
+Obviously, if a layout graph $G$ is matched by another graph $G'$, any re-rooted subgraph of $G$ must also be matched
+by the subgraph of $G'$ re-rooted at the corresponding node.
+
+\begin{Theorem}\label{thm:submatch}
+If $G' \gmat[f] G = \vect{N,E,p}$, $q \in N$ and $X \subseteq E$,
+then $G' \rrt f(q) \gmat (G \gsub X) \rrt q$.
+\end{Theorem}
+\begin{proof}
+By restricting $f$ to the nodes of $(G \gsub X) \rrt q$.
+\end{proof}
+
+\begin{Corollary}\label{thm:match-unique}
+If there are two morphisms $f_1$ and $f_2$ such that $G' \gmat G$ under $f_1$ and $f_2$,
+then $f_1$ = $f_2$, i.e., the match morphism is unique.
+\end{Corollary}
+\begin{proof}
+By induction on the number of nodes. We remove all the incoming edges to the root, and apply \autoref{thm:submatch}.
+\end{proof}
+
+On the other hand, by first removing all the incoming edges to the root,
+we can then re-root the residue subgraph to the adjacent nodes of the root,
+to reduce the match problem to the subgraphs.
+By combining the morphisms for these re-rooted subgraphs, if they exist, and adding back the root to the combined morphism,
+we are able to obtain the morphism for the original layout graph, if it exists.
+
+\begin{Theorem}\label{thm:match-reduction}
+Given two layout graphs $G = \vect{N,E,p}$ and $G' = \vect{N',E',p'}$,
+Let $G^\ast = G \gsub \sett{u \la{a} v \in E \mid v = p}$
+be the residue subgraph of $G$ with all the incoming edges to the root removed.
+If
+\begin{enumerate}
+\item for all the outgoing edges from the root $p\la{a}q \in E$,
+\[
+\exists q' \suchthat p'\la{a}q' \in E' \wedge (p = q \vee G' \rrt q' \gmat[f_q] G^\ast \rrt q),
+\]
+\item and for all the incoming edges to the root $u\la{b}p \in E$,
+\[
+\exists q \suchthat f_q(u)\la{b}p' \in E',
+\]
+\end{enumerate}
+then $G' \gmat[f] G$, where $f = \left(\bigcup_q f_q\right) \cup \sett{p \mapsto p'}$.
+\end{Theorem}
+\begin{proof}
+Obviously, by the given conditions, the addition of $\sett{p \mapsto p'}$ preserves the incoming and outgoing edges of the root.
+By the definition of layout graphs, all the nodes are connected to the root, therefore any node in a layout graph must be either the root,
+or in one of the subgraphs re-rooted at the nodes adjacent to the root.
+Hence all we need to prove is that $\bigcup_q f_q$ exists, i.e., if $u \in \dom(f_q) \cap \dom(f_r)$ then $f_q(u) = f_r(u)$.
+This is true by \autoref{thm:submatch} and \autoref{thm:match-unique}, that any (sub)match morphism is unique.
+\end{proof}
+
+Although finding the subgraph isomorphism is NP-complete in general, it can be efficiently done for rooted graphs by a simple depth-first search (\gls{DFS}),
+led to by \autoref{thm:match-reduction}.
+We can determine whether there is a match between two layout graphs by trying to construct the match morphism during the {\DFS}.
+If the construction fails, we can conclude that the match morphism does not exist.
+
+\begin{algorithm}[t]
+\caption{Construction of Match Morphism}\label{algo:match-dfs-cons}
+\DontPrintSemicolon
+\SetKwFunction{DfsMatch}{dfs\_match}
+\KwIn{preorder:~$\subty$, type-assignment:~$\tau$, layout~graphs:~$G$ and $G'$.}
+\KwOut{match morphism:~$f$ if $G' \gmat[f] G$.}
+\KwEx{$\Mismatch$.}
+\Begin{
+  $\vect{N,E,p} = G, \vect{N',E',p'} = G'$\;
+  $f \gets \emptyset$\;
+  \DfsMatch{$E, p, E', p'$}\;
+}
+\medskip
+\Fn{\DfsMatch{$E, p, E', p'$}}{
+  \eIf{$p \in \dom(f)$}{
+    \lIRaise{$\Mismatch$}{%
+      $f(p) \neq p'$
+    }
+  }{
+    \lIRaise{$\Mismatch$}{%
+      $\tau(p') \nsubty \tau(p)$
+    }
+    \lIRaise{$\Mismatch$}{%
+      $p' \in \ran(f)$
+    }
+    $f \gets f \cup \sett{p \mapsto p'}$\;
+    \ForAll{$p \la{a} q \in E$}{
+      \lIRaise{$\Mismatch$}{%
+        $p' \la{a} q' \notin E'$
+      }
+      \DfsMatch{$E, q, E', q'$}\;
+    }
+  }
+}
+\end{algorithm}
+
+\autoref{algo:match-dfs-cons} gives the precise construction procedure.
+It takes the preorder and type-assignment on the nodes and two layout graphs as the input, and
+output a morphism mapping between the nodes of the two graphs, if the match can be established, otherwise an exception is raised.
+The procedure initializes the morphism to an empty map, and starts traversing both layout graphs synchronously from their corresponding roots.
+The {\DfsMatch} function performs the {\DFS}. It checks the \mbox{1-1} mapping and the preorder relation between the two roots, and
+accumulates the mapping to the morphism.
+Then the function checks, w.r.t. the edge labels, the correspondence of the adjacent nodes, and recurs on each pair of them.
+
+\section{Pattern Graphs}
+
+A pattern graph $P = \vect{G, T}$ is a layout graph $P$ with a map $T$ of type-assignment,
+which associates each node with a type. A type can be
+a usual class,
+a subclass,
+a set of values and
+particularly a singleton set of one value.
+The preorder $\subty$ on the node types of such pattern graphs is exactly the subtype relation between two types.
+In principle, a type $t'$ is a subtype of another type $t$ if all objects or values of $t'$ are elements of $t$,
+i.e., $\Elem(t') \subseteq \Elem(t)$.
+
+\begin{table}[t]
+\centering
+\caption{Subtyping Rules}\label{tab:subtyping}
+\begin{mathpar}
+\inferrulel[(Reflexive)]
+  {c \in \AllClasses}
+  {c \subty c}
+\and
+\inferrulel[(Subclass)]
+  {c,d \in \AllClasses \\ \Env \vdash d \mathrel{\mgls{isa}} c}
+  {\Env \vdash d \subty c}
+\and
+\inferrulel[(Subset)]
+  {W \subseteq V \subseteq \AllValues}
+  {W \subty V}
+\and
+\inferrulel[(Value-Type)]
+  {V \subseteq \AllValues \\ t \in \AllClasses \\ \Env \vdash \forall v \in V \suchthat v:t}
+  {\Env \vdash V \subty t},
+\end{mathpar}
+\end{table}
+
+\begin{Definition}[Subtype]\label{def:subtype}
+A type is either a class $c \in \mgls{AllClasses}$ or a set of values $V \subset \mgls{AllValues}$.
+The subtype relation $\subty$ is inferred from the typing environment $\Env$ by the subtyping rules given in \autoref{tab:subtyping},
+where $\isa$ is the subclass relation.
+\end{Definition}
+
+\begin{Theorem}
+The subtype relation $\subty$  in \autoref{def:subtype} is a preorder.
+\end{Theorem}
+\begin{proof}
+All we need is that the subclass relation $\isa$ being unidirectional and transistive, and so it is.
+\end{proof}
+
+\begin{Definition}[Pattern Match]
+Given two pattern graphs $P = \vect{G, T}$, $P' = \vect{G', T'}$ and typing environment $\Env$,
+$P'$ matches $P$ w.r.t. preorder $\subty$ on node types, denoted as $P' \gmatord{\subty} P$,
+if $G' \gmatord{\subty} G$, where $\tau(u') \subty \tau(u) \qdef \Env \vdash T'(u') \subty T(u)$.
+\end{Definition}
+
+An object corresponds to a node in a pattern graph, with the root representing the main object,
+and the edges leading to component objects.
+In most cases, an object must terminate at some value nodes, which are primitives in a programming language, such as integers and booleans.
+It is common to use the value itself as the node. This formulation complicates the graph model by having concrete and multiple types of nodes.
+To keep the nodes pure and abstract, we associate a node $p$ with its value $\nvalue(p)$ through a run-time function.
+We then store this value as a singleton set of one value when constructing the type map of a pattern graph.
+The real type of the node can be obtained from the value, since any terminus does not start a structure, and must have a known type in the type system.
+
+The state $\Sta$ of a running program can be represented by a layout graph $H$,
+together with the above mentioned $\nvalue$ function and the run-time $\atype$ information,
+where $H$ consists of a linked list of scope nodes as a stack,
+with outgoing edges as local variables to the roots of the objects~\cite{ke2009graph}.
+Therefore, a pattern graph can be extracted from a state by re-rooting $H$ at the root $p$ of the object.
+The map of type assignment is constructed from $\atype(p)$,
+which returns the actual type of the object.
+
+\begin{Definition}[Pattern Extraction]
+A pattern graph $P = \vect{G,T}$ is extracted from a state $\Sta = \vect{H,\nvalue,\atype}$ at node $p$,
+denoted as $P = \Sta \rrt p$, where $G = H \rrt p$, and for all $u \in \Nodes(G)$,
+\[
+T(u) = \begin{cases}
+\atype(u) & \mbox{if } u \notin \dom(\nvalue), \\
+\sett{\nvalue(u)} & \mbox{if } u \in \dom(\nvalue).
+\end{cases}
+\]
+\end{Definition}
+
+\section{Match Conjunction and Disjunction}
+
+When we use pattern matching, it is natural to think about matching one object against multiple patterns,
+and take the conjunction or disjunction of the individual matches.
+When taking the conjunction of multiple patterns, we want to know if their overlapping parts are consistent.
+This observation can tell us if it is possible to have some object matching all these patterns simultaneously.
+On the other hand, when taking the disjunction of multiple patterns, the overlapping parts give us the common component of the individual matches.
+This component carries the properties that we can ensure no matter which branch succeeds.
+
+To check whether multiple pattern graphs are consistent, we try to construct a union graph that matches these layouts.
+The construction is divided into two parts. First, we make sure that an isomorphism is possible from each layout to the union.
+This tells whether the patterns are structurally consistent.
+Second, we make sure that there exists at least one type that is a subtype of all the types associated with the corresponding nodes of the patterns,
+better there exists an infimum. This tells whether the patterns are consistent in the type system.
+
+Aliasing is an inherit feature of object references, if a node is a common target of two edges, it can be mapped to two nodes of different layouts separately.
+However, there is no way for this node to be mapped to the two nodes of the union graph simultaneously.
+We need to address the aliasing issue when we use the union graph to deal with match conjunction.
+
+\begin{Definition}[De-aliasing]
+Let $G = \vect{N,E,p}$ and $G' = \vect{N',E',p'}$ be two layout graphs.
+$G$ is a de-aliased graph of $G'$,
+denoted as $G \mathrel{\mgls{gdaf}} G'$,
+if there exists a total function $f: N \to N'$, such that
+\begin{enumerate}
+\item root is preserved, $f(p) = p'$,
+
+\item edges are preserved, $u \la{a} v \in E \implies f(u) \la{a} f(v) \in E'$ and
+$u' \la{a} v' \in E' \implies \exists u\la{a}v \in E \suchthat (u',v') = (f(u),f(v))$.
+\end{enumerate}
+
+For a layout graph $G''$,
+if $\exists G \gda G' \suchthat G'' \covers G$,
+we say $G''$ covers some de-aliased graph of $G'$,
+denoted as $G'' \mathrel{\mgls{coversgda}} G'$.
+If $\exists G \gda G' \suchthat G'' \isosub G$,
+we say $G''$ is covered by some de-aliased graph of $G'$,
+denoted as $G'' \mathrel{\mgls{isosubgda}} G'$.
+\end{Definition}
+
+\begin{Definition}[Union]
+$\co{G}$ is a union of multiple layout graphs $\overline{G}$,
+denoted as $\co{G} \isoeq[f] \bigcup\overline{G}$,
+if $\overline{G \isosub[f] \co{G}}$, and
+for all $G'$ such that $\overline{G \isosub G'}$,
+we have $\co{G} \isosub\gda G'$.
+
+The union is the minimum layout graph that covers all the given layouts, and cannot be further de-aliased.
+\end{Definition}
+
+\begin{Theorem}
+Given multiple layout graphs $\overline{G}$,
+if there exists a layout graph $G'$ that covers all of them,
+there exists the union of $\overline{G}$.
+\end{Theorem}
+\begin{proof}
+Since we have $\overline{G \isosub[f] G'}$, we can construct the union $\co{G}$ from $\overline{f}$ and $\overline{G}$.
+The nodes of $\co{G}$ are mapped from $\overline{\dom(f)}$, and combined only when necessary.
+If a node $u_i$ in $\dom(f_i)$ has the set of incoming paths intersecting with that of a node $u_j$ in $\dom(f_j)$,
+both $u_i$ and $u_j$ should be mapped to one node~\cite{hoare1999trace}.
+Otherwise, they should be mapped to different nodes.
+The existence of $\overline{f}$ guarantees the set of incoming paths of a node in one layout will not lead to more than one node in another layout.
+Such construction splits the target nodes whenever possible, ensuring that the result cannot be further de-aliased.
+\end{proof}
+
+\begin{algorithm}[t]
+\caption{Construction of Union}\label{algo:union-dfs-cons}
+\DontPrintSemicolon
+\SetKwFunction{DfsUnion}{dfs\_union}
+\KwIn{layout graphs:~$\overline{G}$.}
+\KwOut{morphisms to union:~$\overline{f}$.}
+\KwEx{$\NoUnion$.}
+\Begin{
+  $\overline{\vect{N,E,p} = G}$\;
+  $\overline{f \gets \emptyset}$\;
+  \DfsUnion{$\overline{E},\overline{p}$}\;
+}
+\medskip
+\Fn{\DfsUnion{$\overline{E_i},\overline{p_i}$}}{
+  $\overline{k} = \sett{k \in \overline{i} \mid p_k \in \dom(f_k)}$\;
+  $\overline{c} = \overline{i} \gsub \overline{k}$\;
+  $\overline{u = f_k(p_k)}$\;
+  \lIRaise{$\NoUnion$}{$|\sett{\overline{u}}| > 1$}
+  \If{$\overline{c} \neq \emptyset$}{
+    \eIf{$\overline{u} \neq \emptyset$}{
+      \lIRaise{$\NoUnion$}{$u_1 \in \bigcup\overline{\ran(f_c)}$}
+      $\co{p} \gets u_1$
+    }{
+      $\co{p} \gets \text{new node}$
+    }
+    $\overline{f_c \gets f_c \cup \sett{p_c \mapsto \co{p}}}$\;
+    \ForAll{$a,\overline{j} = \sett{j \in \overline{i} \mid p_j\la{a}q_j \in E_j}$}{
+      \DfsUnion{$\overline{E_j},\overline{q_j}$}
+    }
+  }
+}
+\end{algorithm}
+
+As illustrated in \autoref{algo:union-dfs-cons}, we try to construct the morphisms $\overline{f}$ from each graph to the union
+by traversing the graphs simultaneously in {\DFS}, while checking for conflicts.
+In each iteration of the {\DFS}, we collect the nodes $\overline{p_i}$ that have a common incoming path only in those graphs $\overline{G_i}$,
+where $\overline{G_i}$ is a subset of $\overline{G}$.
+These nodes $\overline{p_i}$ should be mapped to the same node in the union.
+We divide $\overline{p_i}$ into two sets, one set $\overline{p_k}$ are previously visited from other paths, the other set $\overline{p_c}$ are not yet visited.
+There are two conflicts to check for.
+First, the visited nodes must all be mapped to one node $u$.
+Second, this $u$ must not be an existing target from those graphs $\overline{G_c}$ where the unvisited nodes reside,
+which means there are two paths leading to one node in $\overline{G_k}$, however leading to two nodes in $\overline{G_c}$.
+If no conflicts are detected, we assign $u$, or a new node if $u$ does not exist, as the mapping target of those unvisited nodes $\overline{p_c}$.
+
+\begin{Definition}[Intersection]
+$\ov{G}$ is an intersection of multiple layout graphs $\overline{G}$,
+denoted as $\ov{G} \isoeq[f \circ g] \bigcap\overline{G}$,
+if $\overline{G \covers[f]\gda[g] \ov{G}}$, and
+for all $G'$ such that $\overline{G \covers\gda G'}$,
+we have $\ov{G} \covers\gda G'$.
+
+The intersection is the maximum layout graph that all the given layouts cover some de-aliased version of it.
+\end{Definition}
+
+\begin{Theorem}
+Given multiple layout graphs $\overline{G}$,
+there always exists the intersection of $\overline{G}$.
+\end{Theorem}
+\begin{proof}
+We can construct the intersection as follows.
+First, the intersection begins with collecting those incoming paths common in all $\overline{G}$.
+Then, if any two paths reach the same node in any one of $\overline{G}$, we combine them into one set of incoming paths,
+otherwise, we keep them as two separate sets.
+Finally, each set of incoming paths is mapped to a node of the intersection.
+Similar to the union, such construction splits the target nodes whenever possible, ensuring that the result cannot be further de-aliased.
+\end{proof}
+
+\begin{algorithm}[t]
+\caption{Construction of Intersection}\label{algo:inter-dfs-cons}
+\DontPrintSemicolon
+\SetKwFunction{DfsInter}{dfs\_inter}
+\KwIn{layout graphs:~$\overline{G}$.}
+\KwOut{morphisms to intersection:~$\overline{f}$.}
+\Begin{
+  $\overline{\vect{N,E,p} = G}$\;
+  $\overline{f \gets \emptyset}$\;
+  \DfsInter{$\overline{E},\overline{p}$}
+}
+\medskip
+\Fn{\DfsInter{$\overline{E},\overline{p}$}}{
+  $\overline{k} = \sett{k \mid p_k \in \dom(f_k)}$\;
+  $\overline{u = f_k(p_k)}$\;
+  \eIf{$\overline{u} \neq \emptyset$}{
+    $\ov{p} \gets u_1$
+  }{
+    $\ov{p} \gets \text{new node}$
+  }
+  $\overline{f \gets f \cup \sett{p \mapsto \ov{p}}}$\;
+  \If{$|\overline{u}| \neq |\overline{p}|$}{
+    \ForAll{$a \suchthat \overline{p\la{a}q \in E}$}{
+      \DfsInter{$\overline{E},\overline{q}$}\;
+    }
+  }
+}
+\end{algorithm}
+
+As illustrated in \autoref{algo:inter-dfs-cons}, the construction of intersection is simpler.
+We again traverse the graphs $\overline{G}$ simultaneously in {\DFS}.
+In each iteration, we collect only those node $\overline{p}$ with a common incoming path in all the given layouts.
+If some of the nodes $\overline{p_k}$ are previously visited, they may have been mapped to multiple nodes $\overline{u}$.
+We take one of the targets $u_1$ to unify the mapping target of all these nodes.
+If all $\overline{p}$ are unvisited, we map all of them to a new node.
+
+The union and intersection give us the common structures of multiple layout graphs,
+however without respect to the preorder between node types.
+If there is an object matching all the given layouts $\overline{G}$,
+it must contain a subgraph $G'$ that can be de-aliased to the union of $\overline{G}$.
+Each node $u'$ of $G'$ corresponds to one node $\co{u}$ of the union in each component match of the conjunction.
+This $\co{u}$ must therefore be of a subtype of all the nodes mapped to it from $\overline{G}$.
+We can assume a better type of $\co{u}$ and thus $u'$, if there exists an infimum type of all the nodes mapped to $\co{u}$.
+
+\begin{Definition}[Match Conjunction]
+$G'$ matches the conjunction of layout graphs $\overline{G}$, w.r.t. preorder $\subty$,
+denoted as $G' \gmatord{\subty} \mgls{bgconj}\overline{G}$,
+if $\overline{G' \gmatord{\subty} G}$.
+\end{Definition}
+
+\begin{algorithm}[t]
+\caption{Construction of Match Conjunction}\label{algo:conj-dfs-cons}
+\DontPrintSemicolon
+\KwIn{typing environment:~$\Env$, pattern graphs:~$\overline{P}$.}
+\KwOut{morphisms to union:~$\overline{f}$ and type~assignment:~$\co{T}$.}
+\KwEx{$\NoUnion,\NoConj$.}
+\Begin{
+  $\overline{\vect{G,T} = P}$\;
+  \autoref{algo:union-dfs-cons}: $\overline{G} \to \overline{f}$\;
+  $\co{T} \gets \emptyset$\;
+  $\co{N} = \bigcup\overline{\ran(f)}$\;
+  \ForAll{$\co{u} \in \co{N}$}{
+    $\overline{k} = \sett{k \mid \co{u} \in \ran(f_k)}$\;
+    $\overline{t_k = T_k(f_k^{-1}(\co{u}))}$\;
+    \lIRaise{$\NoConj$}{$\Env \vdash \nexists t \suchthat \overline{t \subty t_k}$}
+    $\Env \vdash \co{t} = \inf(\overline{t_k})$\;
+    $\co{T} \gets \co{T} \cup \sett{\co{u} \mapsto \co{t}}$
+  }
+}
+\end{algorithm}
+
+\autoref{algo:conj-dfs-cons} constructs the type assignment of the union based on the given patterns.
+We first obtain the union morphisms from the layouts by calling \autoref{algo:union-dfs-cons}.
+Then, for each node $\co{u}$ in the union, we collect all the layouts having nodes mapped to $\co{u}$.
+These layouts correspond to morphisms $\overline{f_k}$ and type assignments $\overline{T_k}$.
+Thus, we are able to look up the types $\overline{t_k}$ associated with the nodes mapped to $\co{u}$, and
+check for the legitimacy of subtyping $\overline{t_k}$.
+If the typing environment does not permit such subtyping, we must conclude that the conjunction of these patterns are not possible.
+If the subtyping is possible, we try to find the infimum $\co{t}$ of $\overline{t_k}$ and associate it with $\co{u}$.
+The type of $\co{u}$ is $\NoType$ if there exists no infimum.
+
+On the contrary, for match disjunction, an object is to match only one of the multiple patterns.
+This is always possible because neither structural nor subtyping conflicts can occur for only one graph.
+Any object that matches one of the given layouts $\overline{G}$ must contain a subgraph $G'$
+which is a de-aliased graph of the intersection of $\overline{G}$.
+Each node $u'$ of $G'$ is mapped to the corresponding node $\ov{u}$ of the intersection
+possibly via any component match of the disjunction.
+This $\ov{u}$ must therefore be of a supertype of all the nodes mapped to it,
+to cope with all the possible individual matches.
+Even if such a supertype exists, it is possibly not unique.
+We can only associate a type with $\ov{u}$ when there is a supremum type of all the nodes mapped to $\ov{u}$.
+
+\begin{Definition}[Match Disjunction]
+$G'$ matches the disjunction of layout graphs $\overline{G}$, w.r.t. preorder $\subty$,
+denoted as $G' \gmatord{\subty} \mgls{bgdisj}\overline{G}$,
+if there exists $G'' \in \overline{G}$ such that $G' \gmatord{\subty} G''$.
+\end{Definition}
+
+\begin{algorithm}[t]
+\caption{Construction of Match Disjunction}\label{algo:disj-dfs-cons}
+\DontPrintSemicolon
+\KwIn{typing environment:~$\Env$, pattern graphs:~$\overline{P}$.}
+\KwOut{morphisms to intersection:~$\overline{f}$ and type~assignment:~$\ov{T}$.}
+\Begin{
+  $\overline{\vect{G,T} = P}$\;
+  \autoref{algo:inter-dfs-cons}: $\overline{G} \to \overline{f}$\;
+  $\ov{T} \gets \emptyset$\;
+  $\ov{N} = \bigcup\overline{\ran(f)}$\;
+  \ForAll{$\ov{u} \in \ov{N}$}{
+    $\overline{t} = \bigcup\overline{\sett{T(u) \mid f(u) = \ov{u}}}$\;
+    $\Env \vdash \ov{t} = \sup(\overline{t})$\;
+    $\ov{T} \gets \ov{T} \cup \sett{\ov{u} \mapsto \ov{t}}$
+  }
+}
+\end{algorithm}
+
+\autoref{algo:disj-dfs-cons} constructs the type assignment of the intersection based on the given patterns.
+We first obtain the intersection morphisms from the layouts by calling \autoref{algo:inter-dfs-cons}.
+Then, for each node $\ov{u}$ in the intersection, we find the nodes mapped to $\ov{u}$ in all the patterns.
+Note that a morphism to the intersection is not injective, there can be more than one nodes mapped to $\ov{u}$.
+Next, we look up the types $\overline{t}$ associated with these nodes.
+Finally, we try to find the supremum $\ov{t}$ of $\overline{t}$ and associate it with $\ov{u}$.
+The type of $\ov{u}$ is $\NoType$ if there exists no supremum.
+
+\endinput

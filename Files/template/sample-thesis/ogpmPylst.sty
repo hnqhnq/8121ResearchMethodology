@@ -1,0 +1,36 @@
+\ProvidesPackage{ogpmPylst}[2013/12/31]
+
+\RequirePackage{listings}
+
+\lstdefinestyle{myCommon}{%
+        flexiblecolumns=true,
+                  texcl=true,
+                upquote=true,
+             escapechar=`,
+           keywordstyle=[3]\color{Teal},
+            stringstyle=,
+             basicstyle=\linespread{0.95}\ttfamily\footnotesize,
+           keywordstyle=\color{red!70!blue!75!black},
+           keywordstyle=[2]\color{red!40!blue!80!black},
+           commentstyle=\sffamily\color{DarkGreen}\footnotesize,
+                  frame=tb,
+                numbers=left,
+            xleftmargin=1ex,
+            numberstyle=\scriptsize\color{green!70!blue!50!black},
+                columns=fullflexible,
+             keepspaces=true}
+
+\lstdefinestyle{myPy}{%
+                  style=myCommon,
+               language=Python,
+           morekeywords=[3]{@staticmethod}}
+
+\lstnewenvironment{dispPy}[1][]{\lstset{style=myPy,#1}}{}
+
+\lstdefinestyle{myCPP}{%
+                  style=myCommon,
+               language=C++}
+
+\lstnewenvironment{dispCPP}[1][]{\lstset{style=myCPP,#1}}{}
+
+\endinput

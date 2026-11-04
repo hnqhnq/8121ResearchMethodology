@@ -1,0 +1,57 @@
+\chapter{Discussion}\label{ch:discussion}
+
+We formalize pattern matching in the notions of object graphs.
+Although our intention is to specify patterns according to the underlying stored structures,
+the nodes, edges, labels and preorder are in fact abstract, thus can represent a wider range of relations between objects.
+For example, we can replace concrete attributes with getter methods. The patterns to match will not change in this case,
+and the pattern graph of the object to examine can be obtained by first calling the getters.
+Even if side effects exist, the semantics of evaluating the getters can be made unambiguous, possibly imitating lazy evaluation.
+Edge labels can be parameter positions of a decomposition function, patterns with such positional labels can be matched by the tuple result of the decomposition.
+
+The nodes in our pattern graphs are pure identities. Value objects have to be represented as pure nodes associated with singleton sets.
+Since we treat value sets as types, matching values is classified as matching types.
+Because not only an identical type matches, a subtype also matches, this gives the benefit to match a value against a range of values, for a subset can be seen as a subtype.
+For example, pattern $T(e = [5,\ldots,9])$ is matched by a tree node whose element is between $5$ and $9$.
+This arrangement supersedes the traditional matching of value cases.
+
+The mechanism to specify and detect aliasing is a distinct feature of our system.
+However, it also brings certain restriction. Sometimes we want to ignore the aliasing by intention, especially for immutable objects whose aliases are safe.
+For example, we may write a pattern $T(c = S, d = S)$ to test if an  object has two components both of type $S$.
+While an object with layout $p_3$ in \autoref{fig:junction} matches the pattern, but an object with layout $p_4$ does not.
+This causes some inconvenience. In the case to ignore aliasing, we can try match conjunction $T(c = S) \gconj T(d = S)$ to split the aliased node into two component tests.
+However, we cannot use match conjunction to ignore cycles, for example, the layout in \autoref{fig:obj-pattern} does not match pattern $T(l = T(r = T(l = T)))$,
+because there's no way to split a node that is both a source and a target into two tests.
+A better solution is to construct an intermediate object graph to split (de-alias) the nodes that are to ignore aliases and cycles beforehand,
+and match the intermediate graph against the pattern.
+This can be optimized into a slightly modified match algorithm, based on \autoref{algo:match-dfs-cons},
+to split the nodes on the fly in construction of the match morphism.
+
+The subtyping in our pattern matching only needs to be a preorder in the match of a single pattern.
+In match conjunction, the node of an object to match must has a subtype of multiple types.
+In the classical single inheritance hierarchy, unless these types form an inheritance chain, the match cannot succeed.
+Modern {\OO} languages all have interfaces that support multiple inheritance, therefore, a subtype of multiple unrelated types is possible.
+However, there may exist no infimum.
+For a match conjunction $T(a = x: I) \gconj T(a = J)$, we may have $A$ and $B$ both extending $I$ and $J$, but the common $\inf(I, J)$ does not exist.
+In this case, we must fall back the type of $x$ to $I$ even if we know that $x$ must also have type $J$ when a match succeeds.
+In languages supporting intersection types~\cite{ghilezan1996strong},
+$\inf(I,J) = I \cap J$ can be generated and assigned to $x$ for better typing.
+
+On the other hand, to find the type of a variable in match disjunction is even more complicated.
+Consider the following disjunction,
+$$
+p: T(a = I, b = J, c = x: X) \gdisj q: T(a = y: K, b = y).
+$$
+Not like in a dynamic language such as Python, where using undefined variables is allowed to raise run-time exceptions,
+for a statically typed language, we must guarantee that a program which passes type-checking must not have such exceptions.
+First, we must reject the use of any variable like $x$ which is not in the common part of the disjunction.
+This is done by assigning $\NoType$ to $x$.
+Second, we must collect all the types of a node that possibly occurs in any part of the disjunction with the same incoming path.
+For $y$, the set of incoming paths is $\sett{[a],[b]}$, therefore, the type of $y$ must be a supertype of all the types reachable from $\sett{[a],[b]}$.
+The best choice of this supertype is the supremum, $\sup(I,J,K)$, if it exists. Otherwise, we choose $\NoType$ to reject $y$,
+in fact, although nondeterministic, any supertype of $I$, $J$ and $K$ will not break the type system.
+Even if $y$ is properly typed, there is still a problem when an object $o$ matches $p$ rather than $q$.
+Both $o.a$ and $o.b$ are legible for the initialization of $y$ with type safety.
+We take nondeterministic choice here, and any implementation can decide which one to choose in a specific way.
+With such complexity handling match disjunction, Scala even decides to forbid variable binding in its \emph{pattern alternatives}.
+
+\endinput

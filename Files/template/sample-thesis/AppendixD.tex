@@ -1,0 +1,271 @@
+\chapter{Biography}\label{app:biography}
+
+\begin{BlindRegion}
+
+\newcommand{\tikzinterlines}[6][8]{%
+  \path let
+    \p1=(#2),
+    \p2=(#3),
+    \p3=(#4),
+    \p4=(#5),
+    \n{x12}={(\x1-\x2)/#1},
+    \n{y12}={(\y1-\y2)/#1},
+    \n{x34}={(\x3-\x4)/#1},
+    \n{y34}={(\y3-\y4)/#1},
+    \n{xy12}={\x1/#1*\y2/#1-\y1/#1*\x2/#1},
+    \n{xy34}={\x3/#1*\y4/#1-\y3/#1*\x4/#1},
+    \n{x}={(\n{xy12}*\n{x34}-\n{x12}*\n{xy34})/(\n{x12}*\n{y34}-\n{y12}*\n{x34})},
+    \n{y}={(\n{xy12}*\n{y34}-\n{y12}*\n{xy34})/(\n{x12}*\n{y34}-\n{y12}*\n{x34})}
+  in
+    coordinate (#6) at (#1*\n{x},#1*\n{y});
+}
+
+\newcommand\tikzhyperbola[7][thick]{%
+  \draw [#1,rotate={#2},shift={#3}]
+    plot [variable=\t,samples=100,smooth,domain=#6:#7] ({#4*sec(\t)},{#5*tan(\t)});
+  \draw [#1,rotate={#2},shift={#3}]
+    plot [variable=\t,samples=100,smooth,domain=#6:#7] ({-#4*sec(\t)},{#5*tan(\t)});
+}
+
+\newcommand{\tikztantocircle}[5]{%
+  \path let
+    \p0=(#1),
+    \p{r}=(#2,0),
+    \n{r}={\x{r}},
+    \p{a}=(#3),
+    \n{dx}={\x{a}-\x0},
+    \n{dy}={\y{a}-\y0},
+    \n{theta0}={atan2(\n{dy},\n{dx})},
+    \n{theta}={acos(\n{r}/veclen(\n{dx},\n{dy})},
+    \n{x3}={\x0+\n{r}*cos(\n{theta0}+\n{theta})},
+    \n{y3}={\y0+\n{r}*sin(\n{theta0}+\n{theta})},
+    \n{x4}={\x0+\n{r}*cos(\n{theta0}-\n{theta})},
+    \n{y4}={\y0+\n{r}*sin(\n{theta0}-\n{theta})}
+  in
+    coordinate (#4) at (\n{x3},\n{y3})
+    coordinate (#5) at (\n{x4},\n{y4});
+}
+
+\newsavebox{\BrianchonPicture}
+\sbox{\BrianchonPicture}{
+  \begin{tikzpicture}[x=3.8pt,y=3.8pt]
+    \def\a{12}
+    \def\b{9}
+    \def\Rot{70}
+    \def\Sh{(0,0)}
+    \tikzhyperbola{\Rot}{\Sh}{\a}{\b}{-50}{63}
+    \foreach \i/\y/\ty in {1/15/-15,2/3/-15,3/-6/15,4/-8/15,5/2/-15,6/16/-15} {
+      \pgfmathsetmacro{\s}{\i <= 3 ? -1 : 1}
+      \pgfmathsetmacro{\x}{\s*sqrt(\a*\a*(1+\y*\y/(\b*\b)))}
+      \pgfmathsetmacro{\tx}{(1+(\y*\ty)/(\b*\b))/(\x/(\a*\a))}
+      \coordinate (r\i) at (\x,\y);
+      \coordinate (rt\i) at (\tx,\ty);
+    }
+    \foreach \i in {1,...,6} {
+      \coordinate (\i) at ([rotate={\Rot},shift={\Sh}]r\i);
+      \coordinate (t\i) at ([rotate={\Rot},shift={\Sh}]rt\i);
+    }
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6,6/1} {
+      \tikzinterlines{\i}{t\i}{\j}{t\j}{x\i}
+    }
+    \tikzinterlines{x1}{x4}{x2}{x5}{x7}
+
+    \foreach \i/\j in {1/x6,x1/x2,3/x3,x3/4,x4/x5,6/x6}
+      \path[draw=SteelBlue,thick] (\i) -- (\j);
+
+    \foreach \i/\j in {x1/x6,x1/x2,x2/x3,x3/x4,x4/x5,x5/x6}
+      \path[draw=SteelBlue,very thick] (\i) -- (\j);
+
+    \foreach \i/\j in {1/4,2/5,3/6}
+      \path[draw=Crimson,very thick] (x\i) -- (x\j);
+
+    \foreach \i in {1,...,6} {
+      \path[draw=none,fill=SteelBlue] (\i) circle (2pt);
+      \path[draw=black,thick,fill=white] (x\i) circle (2pt);
+    }
+
+    \path[draw=black,thick,fill=Crimson] (x7) circle (2pt);
+  \end{tikzpicture}
+}
+
+\newsavebox{\PascalPicture}
+\sbox{\PascalPicture}{
+  \tikz[x=5pt,y=5pt]{
+    \path[draw=black,thick,rotate=70] (0,0) ellipse (12 and 8);
+
+    \foreach \i/\a in {1/10, 2/30, 3/60, 4/100, 5/150, 6/210} {
+      \coordinate (r\i) at (\a:12 and 8);
+      \coordinate (\i) at ([rotate=70]r\i);
+    }
+
+    \tikzinterlines{1}{2}{4}{5}{x14}
+    \tikzinterlines{2}{3}{5}{6}{x25}
+    \tikzinterlines{3}{4}{6}{1}{x36}
+    \foreach \i/\j in {1/4,2/5,3/6}
+      \foreach \k in {\i,\j}
+        \path[draw=SteelBlue,thick] (\k) -- (x\i\j);
+    \path[draw=Crimson,very thick] (x25) -- (x36);
+    \path[draw=SteelBlue,very thick] (1) -- (2) -- (3) -- (4) -- (5) -- (6) -- cycle;
+
+    \foreach \i in {1,2,3,4,5,6,x14,x25,x36}
+      \path[draw=black,thick,fill=white] (\i) circle (2pt);
+  }
+}
+
+\newsavebox{\DesarguesPicture}
+\sbox{\DesarguesPicture}{
+  \begin{tikzpicture}[x=5pt,y=5pt,baseline=(x2)]
+    \coordinate (o) at (0,0);
+    \foreach \v/\a/\r/\s in {A/85/24/0.4,B/110/30/0.5,C/150/23/0.7}
+      \draw[thick,SteelBlue] (o) -- coordinate[pos=\s] (\v1) +(\a:\r) coordinate (\v);
+
+    \tikzinterlines{A}{B}{A1}{B1}{x1}
+    \tikzinterlines{B}{C}{B1}{C1}{x2}
+    \tikzinterlines{A}{C}{A1}{C1}{x3}
+
+    \draw[SlateGray,thick] (A) -- (x1) (A1) -- (x1);
+    \draw[SlateGray,thick] (B) -- (x2) (B1) -- (x2);
+    \draw[SlateGray,thick] (A) -- (x3) (A1) -- (x3);
+
+    \draw[black,very thick,fill=Olive,fill opacity=0.75] (A) -- (B) -- (C) -- cycle;
+    \draw[black,very thick,fill=OliveDrab,fill opacity=0.75] (A1) -- (B1) -- (C1) -- cycle;
+
+    \draw[Crimson,very thick] (x1) -- (x2);
+
+    \foreach \c/\s in {{white/x1,x2,x3},{SteelBlue/o}}
+      \foreach \i in \s
+        \path[draw=black,thick,fill=\c] (\i) circle (2pt);
+  \end{tikzpicture}
+}
+
+\newsavebox{\MongePicture}
+\sbox{\MongePicture}{
+  \begin{tikzpicture}[x=5pt,y=5pt,baseline=(AB)]
+    \pgfmathsetmacro{\rA}{8}
+    \pgfmathsetmacro{\rB}{5}
+    \pgfmathsetmacro{\rC}{3}
+    \pgfmathsetmacro{\rAB}{\rA/(\rA-\rB)}
+    \pgfmathsetmacro{\iAC}{\rC/\rA}
+    \pgfmathsetmacro{\rBC}{\rB/(\rB-\rC)}
+
+    \draw[very thick,black] (100:32) coordinate (A) circle (\rA);
+    \draw[very thick,black] (75:20) coordinate (B) circle (\rB);
+    \coordinate (AB) at ($(A)!\rAB!(B)$);
+    \path let \p1=(AB),\p2=(A) in
+      coordinate (AC) at (\x2-1,\y1)
+      coordinate (C) at ($(AC)!\iAC!(A)$);
+    \coordinate (BC) at ($(B)!\rBC!(C)$);
+    \draw[very thick,black] (C) circle (\rC);
+
+    \foreach \i/\j in {A/B,A/C,B/C} {
+      \tikztantocircle{\i}{\csname r\i\endcsname}{\i\j}{\i\j\i1}{\i\j\i2}
+      \tikztantocircle{\j}{\csname r\j\endcsname}{\i\j}{\i\j\j1}{\i\j\j2}
+    }
+
+    \foreach \c/\i/\s in {{SteelBlue/AB/ABA1,ABA2},{SeaGreen/AC/ACA1,ACA2},{Orchid/BC/BCB1,BCB2}}
+      \foreach \j in \s
+        \draw[\c,thick] (\i) -- (\j);
+
+    \draw[Crimson,very thick] (AB) -- (BC);
+
+    \foreach \c/\s in {{SteelBlue/ABA1,ABA2,ABB1,ABB2},{SeaGreen/ACA1,ACA2,ACC1,ACC2},{Orchid/BCB1,BCB2,BCC1,BCC2},{Crimson/AB,AC,BC}}
+      \foreach \i in \s
+        \path[draw=black,thick,fill=\c] (\i) circle (2pt);
+  \end{tikzpicture}
+}
+
+\begin{wrapfigure}{l}{1.5in}
+\resizebox{\linewidth}{!}{\usebox{\BrianchonPicture}} \\
+\resizebox{\linewidth}{!}{\usebox{\PascalPicture}}
+\end{wrapfigure}
+\paragraph{\InsertStudentName}
+Brianchon's theorem~\cite{hilbert1932ansgeo} is the dual of Pascal's theorem.
+It states that, given a hexagon circumscribed on a conic section, the three lines joining opposite polygon vertices (polygon diagonals) meet in a single point.
+\par
+Pascal's theorem is the dual of Brianchon's theorem,
+discovered by Blaise Pascal in 1640 when he was just 16 years old.
+It states that, given a hexagon inscribed in a conic section, the three pairs of the continuations of opposite sides meet on a straight line, called the Pascal line.
+
+\paragraph{\InsertSupervisor}
+Desargues' theorem is self-dual.
+It states that, if the three straight lines joining the corresponding vertices of two triangles all meet in a point (the perspector),
+then the three intersections of pairs of corresponding sides lie on a straight line (the perspectrix).
+Equivalently, if two triangles are perspective from a point, they are perspective from a line.
+\par
+Monge's Theorem~\cite{monge1827desgeo} states that, if we draw three circles in the plane, none of which lies completely inside another, and the common external tangent lines for each pair,
+then points of intersection of the three pairs of tangent lines lie on a straight line.
+\par
+Two books --- ``G\'{e}om\'{e}trie Descriptive'' and ``Anschauliche Geometrie'', the Chinese editions --- influenced me the most on my interest in geometry when I was a teenager.
+Over the years, these masterpieces are still so enjoyable to read.
+
+\paragraph{Remarks on Ti\emph{k}Z}
+{\tt\textbackslash path} {\tt plot} takes parametric equations, drawing most types of curves.
+{\tt\textbackslash pgfmath} and {\tt\textbackslash path} {\tt let} enable us to write very complex mathematics.
+However, with 32-bit fixed-point arithmetic, the precision and range are limited.
+
+\begin{figure}[b]
+\raggedleft
+\resizebox{1.44in}{!}{\usebox{\DesarguesPicture}}
+\hspace{2em}
+\resizebox{1.8in}{!}{\usebox{\MongePicture}}
+\end{figure}
+
+\cleardoublepage\pagestyle{empty}
+\def\RuledSurf{
+\foreach \i in {0,...,\m} {
+  \pgfmathsetmacro{\d}{\i/\m*360+5}
+  \coordinate (B\i) at ($(b)+(\d:{\bela} and {\belb})$);
+  \coordinate (T\i) at ($(t)+(\d:{\tela} and {\telb})$);
+}
+\draw[very thick,Crimson] (b) ellipse ({\bela} and {\belb});
+\foreach \i in {0,...,\m} {
+  \pgfmathsetmacro{\j}{Mod(\i+\f,\m)}
+  \pgfmathsetmacro{\k}{Mod(\i-\f,\m)}
+  \draw[Plum] (T\i) -- (B\j) coordinate (C\i);
+  \draw[Tan] (T\i) -- (B\k)  coordinate (D\i);
+}
+\draw[very thick,Teal] (t) ellipse ({\tela} and {\telb});
+
+\foreach \i/\j/\k in {5/17/1,14/27/3,23/37/5} {
+  \tikzinterlines[16]{T\i}{C\i}{T\j}{D\j}{x\k}
+}
+\foreach \i/\j/\k in {17/14/2,27/23/4,37/5/6} {
+  \tikzinterlines[16]{T\i}{D\i}{T\j}{C\j}{x\k}
+}
+
+\foreach \i/\j in {1/2,2/3,3/4,4/5,5/6,6/1}
+  \draw[very thick,Coral] (x\i) -- (x\j);
+
+\tikzinterlines[20]{x1}{x4}{x2}{x5}{xx}
+\draw[very thick,Crimson] (x1) -- (x4) (x2) -- (x5) (x6) -- (xx);
+
+\foreach \c/\s in {{white/1,2,3,4,5,6},{Crimson/x}}
+  \foreach \i in \s
+    \path[draw=black,thick,fill=\c] (x\i) circle (1.5pt);
+}
+\begin{figure}[p]
+\centering
+\begin{tikzpicture}[x=5pt,y=5pt]
+\def\m{70}\def\f{22}
+\def\tela{20}\def\telb{6}
+\def\bela{10}\def\belb{3}
+\coordinate (b) at (0,0);
+\coordinate (t) at (-8,100);
+\RuledSurf
+\def\m{70}\def\f{22}
+\def\tela{20}\def\telb{20}
+\def\bela{10}\def\belb{10}
+\coordinate (b) at (38,40);
+\coordinate (t) at (30,40);
+\RuledSurf
+\end{tikzpicture}
+\end{figure}
+
+\end{BlindRegion}
+
+\cleardoublepage
+%%
+%% END OF THESIS
+%%
+
+\endinput

@@ -1,0 +1,586 @@
+\documentclass[PCOM,Proposal,Review]{mpThesis}
+
+\StudentName{Brianchon Pascal}
+\StudentNumber{P-12-1234-1}
+\Supervisor{Desargues Monge}
+
+%% info for final proposal
+\ThesisNumber{9876}{\InsertProgrammeCode}{\InsertAcademicShort}{pascal}{sample}
+% the word `sample' here can be replaced with any word related to the content of this proposal.
+\DefenceDateTime{9876-01-02}{23:59:00} % Oral Examination Date (YYYY-MM-DD), and Time (hh:mm:ss)
+\PanelChair{<<Chair>>}
+\PanelExaminer{<<Examiner>>}
+%%
+
+\Title%
+[A Research Proposal \\ Skeleton]% for binder
+{A Research Proposal Skeleton}
+
+\ThesisKeywords{%
+  research proposal,
+  skeleton,
+  outline}
+
+\Date{\InsertThesisClassDate} %Submission Date (YYYY-MM-DD)
+
+\EmphasizeAuthors{emphasized/author/list/3}
+\bibliographystyle{mpUnsrt.bst}
+
+%% the Remark environment
+\newif\ifShowRemarks
+\newcommand{\ShowRemarks}{\ShowRemarkstrue}
+\newcommand{\HideRemarks}{\ShowRemarksfalse}
+\ShowRemarks % \HideRemarks hides the remarks.
+\NewDocumentEnvironment{Remark}{+b}{\ifShowRemarks\color{Teal}#1\fi}{}
+\newcommand{\Hd}[1]{{\color{SteelBlue}\bf#1}}
+%%
+
+\begin{document}
+%%
+%%
+\begin{FrontMatter}[FigLs=true,TabLs=true,AlgoLs=false,AbbreLs=true]
+%%
+\input{Declaration.tex}
+
+%%
+\chapter{Abstract}
+
+\begin{Remark}
+The abstract of a research proposal is your chance to make a strong first impression.
+It should be concise, compelling, and informative, summarizing the key elements of your proposed study.
+Here's what to include:
+\begin{enumerate}
+\item \Hd{Background \& Context} \\
+Briefly introduce the topic and explain its relevance. Mention any gaps or unresolved issues in current knowledge.
+
+\item \Hd{Research Problem or Question} \\
+Clearly state the central question or hypothesis your research will address.
+
+\item \Hd{Objectives} \\
+Outline the main goals of your study. What are you trying to discover, prove, or analyze?
+
+\item \Hd{Methodology} \\
+Summarize the methods you will use (e.g., experiments, algorithms, theories, data analysis). Mention your sample, tools, or techniques if relevant.
+
+\item \Hd{Expected Outcomes} \\
+Highlight what you expect to find or contribute. How will your research add value to the field?
+
+\item \Hd{Significance} \\
+Explain the potential impact of your research. Who will benefit, and why is it important?
+\end{enumerate}
+\end{Remark}
+\Keywords{\InsertThesisKeywords}
+
+%%
+\chapter{Acknowledgments}
+
+\begin{Remark}
+In the acknowledgments section of a research proposal, your goal is to briefly and sincerely recognize
+the individuals, institutions, or organizations that have supported your research journey so far.
+This section is typically short, just a paragraph or two, and written in a formal but appreciative tone.
+\begin{enumerate}
+\item \Hd{Academic Advisors or Supervisors} \\
+Thank your mentor(s) or supervisor(s) for their guidance, feedback, and support.
+
+\item \Hd{Funding Sources} \\
+Mention any scholarships, grants, or institutional support (if applicable).
+
+\item \Hd{Collaborators or Colleagues} \\
+Acknowledge peers or collaborators who contributed ideas or assistance.
+
+\item \Hd{Institutional Support} \\
+Recognize your university, department, or lab for providing resources or facilities.
+
+\item \Hd{Personal Support (optional)} \\
+You may briefly thank family or friends for emotional support, but keep it professional.
+\end{enumerate}
+\end{Remark}
+
+\end{FrontMatter}
+%%
+%%
+\begin{MainMatter}
+%%
+\chapter{Introduction}
+\label{ch:introduction}
+\minitoc
+
+\begin{Remark}
+The introduction chapter of a research proposal sets the stage for your entire project.
+It should be clear, engaging, and informative, convincing readers that your research is important, timely, and well thought out.
+Here's a breakdown of what to include:
+\begin{enumerate}
+\item \Hd{Background and Context}
+  \begin{itemize}
+  \item Introduce the topic and explain its relevance.
+
+  \item Provide a brief overview of existing research or knowledge.
+
+  \item Highlight any gaps, controversies, or unresolved issues.
+  \end{itemize}
+
+\item \Hd{Research Problem or Question}
+  \begin{itemize}
+  \item Clearly state the central problem or question your research addresses.
+
+  \item Explain why this problem is significant and worth investigating.
+  \end{itemize}
+
+\item \Hd{Research Objectives}
+  \begin{itemize}
+  \item Outline the specific goals of your study.
+
+  \item These should be measurable and aligned with your research question.
+  \end{itemize}
+
+\item \Hd{Rationale and Justification}
+  \begin{itemize}
+  \item Explain why this research is needed.
+
+  \item Discuss how it contributes to the field, fills a gap, or solves a real-world issue.
+  \end{itemize}
+
+\item \Hd{Scope and Limitations}
+  \begin{itemize}
+  \item Define the boundaries of your study (e.g., geographic, temporal, demographic).
+
+  \item Mention any known limitations or constraints.
+  \end{itemize}
+
+\item \Hd{Structure of the Proposal (optional)}
+  \begin{itemize}
+  \item Briefly describe what each chapter or section will cover, especially in longer proposals.
+  \end{itemize}
+\end{enumerate}
+\end{Remark}
+
+%%
+\chapter{Literature Review}
+\label{ch:literature}
+\minitoc
+
+\begin{Remark}
+The literature review chapter of a research proposal is where you demonstrate your understanding of the existing research landscape and justify the need for your study.
+It's not just a summary --- it’s a critical synthesis that shows how your work fits into and builds upon what’s already known.
+\begin{enumerate}
+\item \Hd{Introduction to the Review}
+  \begin{itemize}
+  \item Briefly explain the purpose of the literature review.
+
+  \item Outline how the review is organized (chronologically, thematically, methodologically, etc.).
+  \end{itemize}
+
+\item \Hd{Overview of Key Theories and Concepts}
+  \begin{itemize}
+  \item Present foundational theories, models, or frameworks relevant to your topic.
+
+  \item Define key terms and concepts that will be used in your study.
+  \end{itemize}
+
+\item \Hd{Review of Existing Studies}
+  \begin{itemize}
+  \item Summarize and critically evaluate major studies related to your research question.
+
+  \item Highlight methodologies, findings, and limitations.
+
+  \item Group studies by theme, approach, or chronology to show progression or divergence.
+  \end{itemize}
+
+\item \Hd{Identification of Gaps}
+  \begin{itemize}
+  \item Point out what’s missing, underexplored, or contested in the current literature.
+
+  \item Explain how these gaps justify your proposed research.
+  \end{itemize}
+
+\item \Hd{Relevance to Your Study}
+  \begin{itemize}
+  \item Connect the reviewed literature to your own research objectives.
+
+  \item Show how your study will build on, challenge, or extend existing work.
+  \end{itemize}
+
+\item \Hd{Summary}
+  \begin{itemize}
+  \item Recap the key insights from the review.
+
+  \item Reinforce the rationale for your research based on the literature.
+  \end{itemize}
+\end{enumerate}
+\end{Remark}
+
+%%
+\chapter{Problem Formulation}
+\label{ch:problem}
+\minitoc
+
+\begin{Remark}
+The problem formulation chapter is a foundational component of a research proposal that precisely defines the core issue the study seeks to address.
+This chapter serves not only to describe the problem in conceptual terms
+but also to formalize it using mathematical models, algorithmic structures, or system specifications.
+It bridges the gap between abstract ideas and concrete research objectives,
+ensuring that the problem is well-understood, logically structured, and technically sound.
+
+This chapter typically includes the following elements:
+
+\begin{enumerate}
+\item \Hd{Clear Statement of the Problem}
+
+At its core, the chapter begins by articulating the specific computational or system-level challenge.
+This could involve inefficiencies in existing algorithms, limitations in scalability, unresolved security vulnerabilities, or gaps in automation.
+The problem should be stated in precise, technical language that reflects its complexity and relevance to the field.
+
+\item \Hd{Contextualization within the Field}
+
+The problem must be situated within the broader landscape of computer science.
+This involves referencing existing technologies, frameworks, or paradigm --- such as
+machine learning, distributed computing, software engineering, or human-computer interaction --- and
+explaining how the problem fits within current trends or challenges.
+This section demonstrates the researcher’s awareness of the state of the art and the relevance of the problem.
+
+\item \Hd{Justification and Significance}
+
+This section explains why the problem is important to solve.
+It identifies the stakeholders affected --- such as developers, users, enterprises, or society at large --- and
+outlines the consequences of leaving the problem unresolved.
+It also highlights gaps in existing research, limitations of current solutions, or emerging needs that make the problem timely and impactful.
+
+\item \Hd{Formalization of the Problem}
+
+In computer science, formalization is essential. This involves translating the problem into a structured model using
+mathematical notation, logical expressions, or algorithmic frameworks.
+It defines the inputs, outputs, constraints, and objectives of the problem, often framing it as an optimization task, classification challenge, or system design issue.
+This formalization enables the use of computational techniques such as linear programming, graph algorithms, or machine learning models to solve the problem.
+
+\item \Hd{Research Questions or Hypotheses}
+
+Derived from the formalized problem, this section presents the central research questions or hypotheses.
+These guide the investigation and define what the study aims to discover, prove, or develop.
+In computer science, these often relate to performance metrics, algorithmic efficiency, system robustness, or theoretical properties.
+
+\item \Hd{Objectives Aligned with the Problem}
+
+The research objectives should directly respond to the problem formulation.
+They specify what the study intends to achieve --- such as
+designing a new algorithm, developing a prototype system, or validating a theoretical model.
+Each objective should be measurable and logically derived from the problem structure.
+
+\item \Hd{Scope and Delimitations}
+
+Finally, the chapter should define the boundaries of the problem.
+This includes specifying what aspects are intentionally excluded from the study --- such as
+hardware-level optimizations, user interface design, or real-time constraints beyond a certain threshold.
+This helps manage expectations and ensures the research remains focused.
+\end{enumerate}
+
+A well-crafted problem formulation chapter ensures that the research is grounded, feasible, and intellectually rigorous. In computer science or related fields, where precision and formal logic are paramount, this chapter lays the groundwork for everything that follows—from methodology to implementation to evaluation.
+\end{Remark}
+
+%%
+\chapter{Methodology}
+\label{ch:method}
+\minitoc
+
+\begin{Remark}
+The methodology chapter of a research proposal is where you explain exactly how you plan to conduct your study. It’s the blueprint for your research design, showing that your approach is logical, feasible, and aligned with your objectives. In computer science, this often involves algorithm development, system architecture, simulation, or empirical testing.
+\begin{enumerate}
+\item \Hd{Research Design}
+  \begin{itemize}
+  \item Describe the overall approach: experimental, analytical, simulation-based, qualitative, or mixed methods.
+
+  \item Justify why this design is appropriate for your research problem.
+  \end{itemize}
+
+\item \Hd{Data Collection Methods}
+  \begin{itemize}
+  \item Specify how data will be gathered: from datasets, sensors, logs, user studies, benchmarks, etc.
+
+  \item Mention sources (e.g., public repositories, custom instrumentation).
+
+  \item If applicable, describe sampling techniques or selection criteria.
+  \end{itemize}
+
+\item \Hd{Tools, Technologies, and Platforms}
+  \begin{itemize}
+  \item List programming languages, frameworks, libraries, and hardware/software environments.
+
+  \item Justify your choices based on compatibility, performance, or community support.
+  \end{itemize}
+
+\item \Hd{Algorithm or System Description}
+  \begin{itemize}
+  \item Provide a detailed explanation of the algorithm, model, or system you will build or test.
+
+  \item Include flowcharts, pseudocode, or architectural diagrams if relevant.
+
+  \item Define input/output formats, parameters, and expected behavior.
+  \end{itemize}
+
+\item \Hd{Evaluation Strategy}
+  \begin{itemize}
+  \item Explain how you will assess the effectiveness of your solution.
+
+  \item Define metrics (e.g., accuracy, latency, throughput, precision, recall).
+
+  \item Describe baseline comparisons, test scenarios, or benchmarking protocols.
+  \end{itemize}
+
+\item \Hd{Validation and Reliability}
+  \begin{itemize}
+  \item Describe how you will ensure the validity and reliability of your results.
+
+  \item Mention cross-validation, replication, sensitivity analysis, or error checking.
+  \end{itemize}
+
+\item \Hd{Limitations and Assumptions}
+  \begin{itemize}
+  \item Acknowledge any constraints in your methodology.
+
+  \item State assumptions that underpin your design or analysis.
+  \end{itemize}
+\end{enumerate}
+\end{Remark}
+
+%%
+\chapter{Preliminary Results}
+\label{ch:pre-result}
+\minitoc
+
+\begin{Remark}
+The Preliminary Results chapter presents early findings, prototypes, simulations, or feasibility tests
+that support the viability of your proposed research.
+It's not required in every proposal, but when included, it strengthens your case by showing that
+your approach is already yielding promising insights or that your tools and methods are functional.
+\begin{enumerate}
+\item \Hd{Purpose of Preliminary Results}
+  \begin{itemize}
+  \item Explain why you’re including this chapter.
+
+  \item Clarify that these results are early-stage and not final.
+
+  \item Emphasize how they support the feasibility or relevance of your research.
+  \end{itemize}
+
+\item \Hd{Experimental Setup or Prototype Description}
+  \begin{itemize}
+  \item Describe the environment, tools, datasets, or systems used.
+
+  \item Mention any assumptions or simplifications made for early testing.
+
+  \item Include diagrams, architecture sketches, or pseudocode if relevant.
+  \end{itemize}
+
+\item \Hd{Early Findings or Observations}
+  \begin{itemize}
+  \item Present key metrics, behaviors, or patterns observed.
+
+  \item Use tables, graphs, or charts to visualize results.
+
+  \item Highlight any unexpected outcomes or limitations.
+  \end{itemize}
+
+\item \Hd{Interpretation and Relevance}
+  \begin{itemize}
+  \item Discuss what these results suggest about your research direction.
+
+  \item Explain how they validate your assumptions or inform your methodology.
+
+  \item If results are inconclusive, note what adjustments will be made.
+  \end{itemize}
+
+\item \Hd{Limitations of Preliminary Work}
+  \begin{itemize}
+  \item Acknowledge constraints such as small sample sizes, simplified models, or incomplete implementations.
+
+  \item Clarify that full-scale testing will be conducted in later stages.
+  \end{itemize}
+
+\item \Hd{Next Steps}
+  \begin{itemize}
+  \item Outline how these results shape your future research.
+
+  \item Mention refinements, expanded testing, or additional data collection.
+  \end{itemize}
+\end{enumerate}
+\end{Remark}
+
+%%
+\chapter{Schedule and Milestones}
+\label{ch:schedule}
+\minitoc
+
+\begin{Remark}
+The schedule and milestones chapter outlines the planned timeline, phases, and deliverables of a research project.
+It serves as a strategic roadmap that demonstrates how the research will be executed in a structured, time-bound, and goal-oriented manner.
+In computer science, where projects often involve system development, algorithm design, and empirical evaluation,
+this chapter is essential for showing that the research is feasible, well-organized, and capable of producing meaningful results.
+\begin{enumerate}
+\item \Hd{Purpose of the Timeline}
+
+This section explains the rationale for including a schedule.
+It shows that the researcher has carefully considered the duration, dependencies, and sequencing of tasks.
+A clear timeline helps manage resources, monitor progress, and ensure accountability throughout the research lifecycle.
+
+\item \Hd{Project Phases}
+
+The research is divided into distinct phases, each representing a major activity or transition.
+In computer science, typical phases include:
+  \begin{itemize}
+  \item Literature review and problem refinement
+
+  \item System architecture or algorithm design
+
+  \item Data collection or simulation setup
+
+  \item Implementation and coding
+
+  \item Testing and evaluation
+
+  \item Analysis and interpretation
+
+  \item Documentation and dissemination
+  \end{itemize}
+Each phase should be time-bound and logically sequenced to reflect the dependencies between tasks.
+
+\item \Hd{Milestones}
+
+Milestones are measurable checkpoints that mark the completion of key tasks.
+They help track progress and ensure that the project remains on schedule.
+In computer science, milestones often include:
+  \begin{itemize}
+  \item Completion of a prototype or system module
+
+  \item Validation of an algorithm or model
+
+  \item Deployment of a simulation environment
+
+  \item Submission of a research paper
+
+  \item Filing of a patent application
+
+  \item Release of a dataset or open-source tool
+  \end{itemize}
+Milestones should be specific, time-stamped, and aligned with the research objectives.
+
+\item \Hd{Integration of Research Outcomes}
+
+A critical component of the schedule and milestones chapter is the inclusion of expected research outcomes.
+These outcomes demonstrate the impact, dissemination, and practical relevance of the research. In computer science, they may include:
+
+  \begin{itemize}
+  \item Peer-reviewed publications in journals or conferences
+
+  \item Functional systems, prototypes, or software tools
+
+  \item Curated datasets for public use
+
+  \item Patent applications or intellectual property filings
+
+  \item Presentations at academic or industry events
+
+  \item Open-source releases or technical documentation
+  \end{itemize}
+By embedding these outcomes into the milestone structure, the researcher shows a commitment to producing tangible contributions that advance the field and benefit the broader community.
+
+\item \Hd{Timeline Format}
+
+The schedule can be presented as a Gantt chart, a table, or a narrative timeline.
+It should clearly indicate the duration of each phase and the expected date of each milestone. Here's an example table:
+\begin{center}
+\small
+\begin{tabular}{|l|>{\raggedright\arraybackslash}p{0.4\linewidth}|>{\raggedright\arraybackslash}p{0.4\linewidth}|}
+\hline
+\textbf{Month} & \textbf{Activity} & \textbf{Milestone / Outcome} \\
+\hline
+1–2 & Literature review & Annotated bibliography completed \\
+\hline
+3–4 & Algorithm design and prototyping & Initial prototype ready \\
+\hline
+5–6 & Simulation and testing & Performance benchmarks collected \\
+\hline
+7 & Evaluation and refinement & Final model validated \\
+\hline
+8 & Paper drafting & Conference paper submitted \\
+\hline
+9 & System deployment & Web-based demo system launched \\
+\hline
+10 & Documentation and reporting & Final report completed; patent application prepared \\
+\hline
+\end{tabular}
+\end{center}
+
+\item \Hd{Contingency Planning (Optional)}
+
+This section outlines how the researcher will handle delays, unexpected challenges, or resource constraints.
+It adds credibility by showing that risks have been considered and mitigated.
+\end{enumerate}
+A well-structured schedule and milestones chapter demonstrates that the researcher has
+a clear plan, understands the scope of the work, and is committed to producing high-impact results.
+In computer science, where innovation and deliverables are key, this chapter is a critical indicator of project success.
+\end{Remark}
+
+%%
+\chapter{Conclusion}
+\label{ch:conclusion}
+\minitoc
+
+\begin{Remark}
+The conclusion chapter is your final opportunity to reinforce the importance, feasibility, and impact of your proposed research.
+It should summarize the key elements of your proposal, reaffirm your commitment to solving the problem, and highlight the expected contributions to the field.
+\begin{enumerate}
+\item \Hd{Restate the Research Problem}
+  \begin{itemize}
+  \item Briefly revisit the core problem your research addresses.
+
+  \item Emphasize its relevance and urgency in the context of computer science.
+  \end{itemize}
+
+\item \Hd{Summarize the Proposed Approach}
+  \begin{itemize}
+  \item Recap your methodology, tools, and techniques.
+
+  \item Highlight why your approach is innovative or well-suited to the problem.
+  \end{itemize}
+
+\item \Hd{Highlight Expected Contributions}
+  \begin{itemize}
+  \item Clearly state what your research will produce: algorithms, systems, datasets, theoretical insights, etc.
+
+  \item Mention how these contributions will advance the field or benefit practitioners.
+  \end{itemize}
+
+\item \Hd{Emphasize Research Outcomes}
+  \begin{itemize}
+  \item Reaffirm your commitment to publishing results, releasing tools, or filing patents.
+
+  \item Mention target venues (e.g., IEEE, ACM, NeurIPS) or platforms (e.g., GitHub, arXiv).
+  \end{itemize}
+
+\item \Hd{Reinforce Feasibility and Impact}
+  \begin{itemize}
+  \item Assert that the project is achievable within the proposed timeline and resources.
+
+  \item End with a confident statement about the significance of your work.
+  \end{itemize}
+\end{enumerate}
+\end{Remark}
+\end{MainMatter}
+%%
+%%
+\begin{BackMatter}
+\bibliography{Emphasized.bib,Bibliography.bib} %list emphasized names and styles in a separate bib, include when needed.
+\end{BackMatter}
+%%
+%%
+\begin{Appendix}
+%%
+\chapter{Biography}
+\label{app:biography}
+
+\end{Appendix}
+%%
+%%
+\end{document}
+
+%%
+%% $Id: proposal-skel.tex 8928 2026-03-27 00:49:55Z wke@IPM.EDU.MO $

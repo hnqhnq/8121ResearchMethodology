@@ -1,0 +1,43 @@
+\newglossaryentry{OO}{name={\OO}, description={object oriented}}
+
+\chapter{Abstract}
+
+Pattern matching has been widely adopted in functional programming languages, and is gradually getting popular in \gls{OO} languages, from Scala to Python.
+The structural pattern matching currently in use has its foundation on algebraic data types from functional languages.
+To better reflect the pointer structures of {\OO} programs, we propose a pattern matching extension to general statically typed {\OO} languages based on object graphs.
+By this extension, we support patterns having aliasing and circular referencing, that are typically found in pointer structures.
+With the requirement of only an abstract subtyping preorder on types, our extension is not restricted to a particular hierarchical class model.
+We give the formal base of the graph model, that is able to handle aliases and cycles in patterns, together with the abstract syntax to construct the object graphs.
+More complex cases of conjunction and disjunction of multiple patterns are explored with resolution.
+We present the type checking rules and operational semantics to reason about the soundness by proving the type safety.
+We also discuss the design decisions, applicability and limitation of our pattern matching extension.
+
+\Keywords{\InsertThesisKeywords}
+
+\begin{ChsAbstract}
+模式匹配在函数式语言中已得到广泛应用，并逐渐在面向对象语言中普及，如 Scala 与 Python。
+现有的结构化模式匹配源于函数式语言的代数数据类型。
+为更好地刻画面向对象程序中的指针结构，本文提出一种基于对象图的通用静态类型面向对象语言的模式匹配扩展。
+该扩展支持包含别名与循环引用的模式，这些特性在指针结构中常见。由于仅依赖于类型上的抽象子类型预序，该方法不受限于特定的类层次模型。
+本文形式化给出了能够处理别名与循环的图模型，并提供了构造对象图的抽象语法。
+同时，我们探讨了多模式合取与析取的复杂情形及其解析机制。
+进一步地，本文提出了类型检查规则与操作语义，并通过证明类型安全性来论证其健全性。
+最后，我们讨论了该模式匹配扩展的设计取舍、适用范围及其局限性。
+\end{ChsAbstract}
+
+\ChsKeywords{\InsertThesisChsKeywords}
+
+\begin{ChtAbstract}
+模式匹配在函數式語言中已得到廣泛應用，並逐漸在面向對象語言中普及，如 Scala 與 Python。
+現有的結構化模式匹配源于函數式語言的代數數據類型。
+爲更好地刻畫面向對象程序中的指針結構，本文提出一種基于對象圖的通用靜態類型面向對象語言的模式匹配擴展。
+該擴展支持包含別名與循環引用的模式，這些特性在指針結構中常見。由于僅依賴于類型上的抽象子類型預序，該方法不受限于特定的類層次模型。
+本文形式化給出了能够處理別名與循環的圖模型，並提供了構造對象圖的抽象語法。
+同時，我們探討了多模式合取與析取的複雜情形及其解析機制。
+進一步地，本文提出了類型檢查規則與操作語義，並通過證明類型安全性來論證其健全性。
+最後，我們討論了該模式匹配擴展的設計取捨、適用範圍及其局限性。
+\end{ChtAbstract}
+
+\ChtKeywords{\InsertThesisChtKeywords}
+
+\endinput

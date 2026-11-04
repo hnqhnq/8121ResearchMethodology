@@ -1,0 +1,782 @@
+\chapter{About This Template}\label{ch:template}
+\minitoc
+
+\makeatletter
+\newcommand*{\NimbusMonoN@scale}{0.9}
+\let\ttdefault@save\ttdefault
+\renewcommand*{\ttdefault}{NimbusMonoN}
+\newcommand{\InsertTemplateVersion}{\mp@thesis@class@version}
+\newcommand{\InsertTemplateDate}{\mp@thesis@class@date}
+\makeatother
+\newcommand{\optna}[1]{{\tt#1}}
+\newcommand{\mana}[1]{\optna{\textbackslash#1}}
+\newcommand{\DeBu}{\mbox{$\dagger$}}
+
+\section{Document Class and Options}
+
+This is the MPU Doctoral Thesis Template, Version {\em\InsertTemplateVersion}, released on Date {\em\InsertTemplateDate}.
+To use this template, we start a {\LaTeX} document by \mana{documentclass\{mpThesis\}}.
+This document class defaults with options: \optna{Libertine}, \optna{PCOM}, \optna{Proposal}, \optna{Review}, \optna{Screen}, \optna{NoHardback}, \optna{OneHalfSpacing}, and \optna{PhDAfterName}.
+The available options are categorized as follows.
+
+\paragraph{Font families}
+\begin{itemize}[noitemsep]
+\item \optna{CM} --- The classic Computer Modern family.
+\item \optna{Times} --- The Times Roman family.
+\item \optna{Utopia} --- The Utopia family.
+\item \optna{Garamond} --- The EBGaramond family.
+\item \optna{Palatino} --- The Palatino family.
+\item[\DeBu] \optna{Libertine} --- The Libertine family.
+\end{itemize}
+
+\paragraph{Programmes}
+\begin{itemize}[noitemsep]
+\item[\DeBu] \optna{PCOM} --- Computer Applied Technology.
+\item \optna{PAIDD} --- Artificial Intelligence driven Drug Discovery.
+\item \optna{PETI} --- Educational Technology and Innovation.
+\item \optna{JUC} --- Computer Applied Technology Joint Programme with University of Coimbra.
+\item \optna{JUB} --- Computer Applied Technology Joint Programme with University of Bologna.
+\end{itemize}
+
+\paragraph{Thesis types}
+\begin{itemize}[noitemsep]
+\item[\DeBu] \optna{Proposal} --- Research proposals for candidature confirmation.
+\item \optna{Thesis} --- Theses for thesis defences.
+\end{itemize}
+
+\paragraph{Thesis display formats}
+\begin{itemize}[noitemsep]
+\item[\DeBu] \optna{Blind} --- Hiding the \optna{BlindRegion} environment and \mana{BlindText}, and disabling the emphasis of author names, to support the double-blind peer review.
+\item[\DeBu] \optna{Review} --- Review format with colored links and vertical rulers.
+\item \optna{Final} --- Final plain format with QR code and defence panel information, no color links and no line numbers.
+\item[\DeBu] \optna{Screen} --- Equal inner and outer margins, for displaying on screen.
+\item \optna{Print} --- Larger inner margins. for printing and binding.
+\item[\DeBu] \optna{NoHardback} --- No spine text and no calligraphic Chinese MPU watermark.
+\item \optna{Hardback} --- Formal binding format, with spine text and calligraphic Chinese MPU watermark.
+\item[\DeBu] \optna{OneHalfSpacing} --- $1.5\times$ line spacing in text.
+\item \optna{DoubleSpacing} --- $2\times$ line spacing in text.
+\item[\DeBu] \optna{PhDAfterName} --- ``Ph. D.'' below the student name on the hardcover.
+\item \optna{NoPhDAfterName} --- No ``Ph. D.'' below the student name on the hardcover.
+\end{itemize}
+
+\paragraph{Algorithm packages}\label{par:algo-options}
+\begin{itemize}[noitemsep]
+\item \optna{AlgoMic} --- Load the traditional \verb|{algorithm}| and \verb|{algorithmic}| packages.
+\item \optna{AlgoX} --- Load the improved \verb|{algorithm}|, \verb|{algorithmicx}| and \verb|{algpseudocode}| packages.
+\item \optna{AlgoIIe} --- Load the improved and combined \verb|{algorithm2e}| package.
+\item \optna{MathPar} --- Load the \verb|{mathpartir}| package for type setting inference rules.
+\end{itemize}
+The \optna{AlgoMic}, \optna{AlgoX} and \optna{AlgoIIe} options are mutually exclusive.
+
+\section{Commands for Setup}
+
+\paragraph{Student and supervisor}
+\begin{itemize}[noitemsep]
+\item \mana{StudentName[<break name>]\{<full name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the student's full name and an optional break-friendly version.
+  \item \textsf{Arguments:}
+    \begin{itemize}[noitemsep]
+      \item \texttt{\#1} (optional): Name with line breaks.
+      \item \texttt{\#2} (required): Full name of the student.
+    \end{itemize}
+  \item \textsf{Example:} \verb|\StudentName[Brianchon\\Pascal]{Brianchon Pascal}|
+\end{itemize}
+
+\item \mana{StudentNumber\{<student number>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Stores the student’s identification number.
+  \item \textsf{Argument:} \texttt{\#1}: Student number.
+  \item \textsf{Example:} \verb|\StudentNumber{P-12-1234-1}|
+\end{itemize}
+
+\item \mana{Supervisor\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the name of the supervisor.
+  \item \textsf{Argument:} \texttt{\#1}: Name of the supervisor.
+  \item \textsf{Example:} \verb|\Supervisor{Desargues Monge}|
+\end{itemize}
+
+\item \mana{JointSupervisor\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the name of the joint supervisor.
+  \item \textsf{Argument:} \texttt{\#1}: Name of the joint supervisor.
+  \item \textsf{Example:} \verb|\JointSupervisor{Euler Gauss}|
+\end{itemize}
+
+\item \mana{CoSupervisor\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the name of the co-supervisor, if any.
+  \item \textsf{Argument:} \texttt{\#1}: Name of the co-supervisor.
+  \item \textsf{Example:} \verb|\CoSupervisor{Hilbert Minkowski}|
+\end{itemize}
+\end{itemize}
+
+\paragraph{Date and time}
+\begin{itemize}[noitemsep]
+\item \mana{Date\{<YYYY-MM-DD>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the document date.
+  \item \textsf{Argument:} \texttt{\#1}: Date in {\tt YYYY-MM-DD} format.
+  \item \textsf{Example:} \verb|\Date{2025-09-17}|
+\end{itemize}
+
+\item \mana{DateToday}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the document date to the current date.
+\end{itemize}
+
+\item \mana{DefenceDateTime\{<YYYY-MM-DD>\}\{<HH:MM>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the date and time of the thesis defence.
+  \item \textsf{Arguments:}
+    \begin{itemize}
+      \item \texttt{\#1}: Date in {\tt YYYY-MM-DD} format.
+      \item \texttt{\#2}: Time in {\tt HH:MM} format.
+    \end{itemize}
+  \item \textsf{Example:} \verb|\DefenceDateTime{2025-10-01}{14:30}|
+\end{itemize}
+\end{itemize}
+
+\paragraph{Thesis}
+\begin{itemize}[noitemsep]
+\item \mana{Title[<break title>]\{<full title>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the thesis title and optional break-friendly version.
+  \item \textsf{Arguments:}
+    \begin{itemize}
+      \item \texttt{\#1} (optional): Title with line breaks.
+      \item \texttt{\#2} (required): Title of the thesis.
+    \end{itemize}
+  \item \textsf{Example:} \verb|\Title[AI\\in Healthcare]{AI in Healthcare}|
+\end{itemize}
+
+\item \mana{ThesisNumber\{<seq>\}\{<programme>\}\{<unit>\}\{<lna>\}\{<ftw>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the thesis number components.
+  \item \textsf{Arguments:}
+    \begin{itemize}
+      \item \texttt{\#1}: Sequence number.
+      \item \texttt{\#2}: Programme code.
+      \item \texttt{\#3}: Academic unit code.
+      \item \texttt{\#4}: Last name of the student.
+      \item \texttt{\#5}: First (non-article) word of the title.
+    \end{itemize}
+  \item \textsf{Example:} \verb|\ThesisNumber{00123}{PCOM}{FCA}{pascal}{sample}|
+\end{itemize}
+
+\item \mana{ThesisKeywords\{<keywords>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets thesis keywords.
+  \item \textsf{Argument:} \texttt{\#1}: List of keywords.
+  \item \textsf{Example:} \verb|\ThesisKeywords{Artificial Intelligence, Healthcare, Machine Learning}|
+\end{itemize}
+
+\item \mana{Keywords\{\textbackslash InsertThesisKeywords\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Displays the stored thesis keywords with the ``Keywords'' prefix.
+\end{itemize}
+\end{itemize}
+
+\paragraph{Chinese Title and Abstract}
+\begin{itemize}[noitemsep]
+\item \mana{ChsTitle\{<full title>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the thesis title in Simplified Chinese.
+  \item \textsf{Arguments:} \texttt{\#1}: Title of the thesis in Simplified Chinese.
+  \item \textsf{Example:} \verb|\ChsTitle{|\ChsTextA{\small论文题目}\verb|}|
+\end{itemize}
+
+\item \mana{ChtTitle\{<full title>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets the thesis title in Traditional Chinese.
+\end{itemize}
+
+\item \mana{ThesisChsKeywords\{<CHS keywords>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets thesis keywords in Simplified Chinese.
+  \item \textsf{Argument:} \texttt{\#1}: List of keywords in Simplified Chinese.
+  \item \textsf{Example:} \verb|\ThesisChsKeywords{|\ChsTextA{\small人工智能、医疗保健、机器学习}\verb|}|
+\end{itemize}
+
+\item \mana{ThesisChtKeywords\{<CHT keywords>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets thesis keywords in Traditional Chinese.
+\end{itemize}
+
+\item Environment \optna{ChsAbstract}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Encloses thesis abstract in Simplified Chinese, and displays the abstract with the Chinese thesis title.
+  \item \textsf{Example:} \verb|\begin{ChsAbstract}|\ChsTextA{\small简体中文摘要}\verb|\end{ChsAbstract}|
+\end{itemize}
+
+\item Environment \optna{ChtAbstract}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Encloses thesis abstract in Traditional Chinese, and displays the abstract with the Chinese thesis title.
+\end{itemize}
+
+\item \mana{ChsKeywords\{\textbackslash InsertThesisChsKeywords\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Displays the stored Simplified Chinese thesis keywords with the ``\ChsTextA{关键字}'' prefix.
+\end{itemize}
+
+\item \mana{ChtKeywords\{\textbackslash InsertThesisChtKeywords\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Displays the stored Traditional Chinese thesis keywords with the ``\ChtTextA{關鍵字}'' prefix.
+\end{itemize}
+\end{itemize}
+
+Chinese text compiled by {pdf\LaTeX} is implemented by the \optna{CJKutf8} package.
+There are only two Simplified Chinese fonts built in the \TeX\ Live distribution.
+If you install your own CJK Chinese fonts in UTF8 encoding, you can specify the fonts to use in the title and abstract,
+by commands: \mana{ChsTitleFont}, \mana{ChtTitleFont}, \mana{ChsHeaderFont}, \mana{ChtHeaderFont}, \mana{ChsTextFont}, and \mana{ChtTextFont}.
+However, you don't usually need to touch these commands.
+
+\paragraph{Panel}
+Each of these sets the name of a panel member:
+\begin{itemize}[noitemsep]
+\item \mana{PanelChair\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets name of the panel chair.
+\end{itemize}
+\item \mana{PanelExternal\{<name>\}} | \mana{PanelExternalA\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets name of the external examiner.
+\end{itemize}
+\item \mana{PanelJointExternal\{<name>\}} | \mana{PanelExternalB\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets name of the external examiner nominated by the joint university.
+\end{itemize}
+\item \mana{PanelInternal\{<name>\}} | \mana{PanelInternalA\{<name>\}} | \\
+\mana{PanelExaminer\{<name>\}} | \mana{PanelExaminerA\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets name of the internal examiner.
+\end{itemize}
+\item \mana{PanelJointInternal\{<name>\}} | \mana{PanelInternalB\{<name>\}} | \\
+\mana{PanelExaminerB\{<name>\}}
+\begin{itemize}[noitemsep]
+  \item \textsf{Purpose:} Sets name of the second internal examiner, or the internal examiner nominated by the joint university.
+\end{itemize}
+\end{itemize}
+
+\section{Commands for Display}
+
+These commands retrieve stored values for use in the document:
+
+\paragraph{Student and supervisor}
+\begin{itemize}[noitemsep]
+\item \mana{InsertStudentName}
+\item \mana{InsertStudentNameBreak}
+\item \mana{InsertStudentNumber}
+\item \mana{InsertSupervisor}
+\item \mana{InsertJointSupervisor}
+\item \mana{InsertCoSupervisor}
+\end{itemize}
+
+\paragraph{University}
+\begin{itemize}[noitemsep]
+\item \mana{InsertUniversity}
+\item \mana{InsertJointUniversity}
+\item \mana{InsertAcademicUnit}
+\item \mana{InsertAcademicShort}
+\end{itemize}
+
+\paragraph{Programme}
+\begin{itemize}[noitemsep]
+\item \mana{InsertProgramme}
+\item \mana{InsertProgrammeBreak}
+\item \mana{InsertJointProgramme}
+\item \mana{InsertJointProgrammeBreak}
+\item \mana{InsertProgrammeCode}
+\end{itemize}
+
+\paragraph{Date and time}
+\begin{itemize}[noitemsep]
+\item \mana{InsertDate}
+\item \mana{InsertLongDate}
+\item \mana{InsertMonthYear}
+\item \mana{InsertYear}
+\item \mana{InsertDefenceDate}
+\item \mana{InsertDefenceTime}
+\end{itemize}
+
+\paragraph{Thesis}
+\begin{itemize}[noitemsep]
+\item \mana{InsertTitle}
+\item \mana{InsertTitleBreak}
+\item \mana{InsertThesisNumber}
+\item \mana{InsertThesisNumberBreak}
+\item \mana{InsertThesisNumberStyle}
+\item \mana{InsertThesisNumberBreakStyle}
+\item \mana{InsertThesisUrl}
+\item \mana{InsertThesisKeywords}
+\item \mana{InsertThesisChsKeywords}
+\end{itemize}
+
+\paragraph{Panel}
+\begin{itemize}[noitemsep]
+\item \mana{InsertPanelChair}
+\item \mana{InsertPanelExternal}
+\item \mana{InsertPanelJointExternal}
+\item \mana{InsertPanelExternalA}
+\item \mana{InsertPanelExternalB}
+\item \mana{InsertPanelInternal}
+\item \mana{InsertPanelJointInternal}
+\item \mana{InsertPanelInternalA}
+\item \mana{InsertPanelInternalB}
+\item \mana{InsertPanelExaminer}
+\item \mana{InsertPanelExaminerA}
+\item \mana{InsertPanelExaminerB}
+\end{itemize}
+
+\paragraph{About this thesis class}
+\begin{itemize}[noitemsep]
+\item \mana{InsertThesisClassVersion} --- ``\InsertThesisClassVersion''
+\item \mana{InsertThesisClassDate} --- ``\InsertThesisClassDate''
+\item \mana{InsertThesisClassDisplayCode} --- ``\InsertThesisClassDisplayCode''
+\end{itemize}
+
+\section{Emphasis of Author Names in Bibliography}
+
+The customized \verb|{mpUnsrt.bst}| bib-style provides code to scan the author list of a bib-entry to find and highlight the specified author names.
+The \verb|.bst| style file is programmed by a postfix language on a stack machine, which is quite interesting to look at.
+
+To specify the author names to emphasize, we need to add entries in the \verb|.bib| file with category \verb|@emphasized|.
+Only two fields are allowed in an entry of this category: \verb|author| and \verb|note|.
+The \verb|author| field specifies the author list as in a normal category, while the \verb|note| field specifies the highlighting style,
+which must be a command taking one argument of the author name, \verb|\textbf| by default. For example:
+\begin{verbatim}
+@emphasized{emphasized/author/list/3,
+  author = {Wei Ke and David Hilbert and Gaspard Monge},
+  note   = {\textbf}
+}
+\end{verbatim}
+
+There can be many entries of this category, and one entry must be selected to take effect.
+To select the entry of the author list, we write \verb|\EmphasizeAuthors{<entry-key>}|. For the above example:
+\begin{verbatim}
+\EmphasizeAuthors{emphasized/author/list/3}
+\end{verbatim}
+This must be done before any bib-entries and the inclusion of the \verb|.bst| and \verb|.bib| files.
+
+By the way, we can use command \verb|\bibentry{<entry-key}| to display a bib-entry anywhere in the thesis outside the bibliography list.
+This is particularly useful for listing the publication produced for the thesis defence, usually in the introduction. See \autoref{sec:publication} for example.
+
+\section{Double-blind Review Format}
+
+To support the double-blind peer review, option \optna{Blind} hides the student and supervisor names.
+The option also disables the double degree modes.
+There are still other sensitive texts that can be used to identify the student and supervisor.
+They must also be hidden.
+Such text can be enclosed within environment \optna{BlindRegion}:
+\begin{verbatim}
+\chapter{Acknowledgements}\label{ch:ack}
+
+\begin{BlindRegion}
+... paragraphs ...
+\end{BlindRegion}
+
+\subsection{Current Publication}\label{sec:publication}
+
+\begin{BlindRegion}
+\begin{enumerate}[label=(C\arabic*)]
+  \item \bibentry{ke2009graph}
+\end{enumerate}
+\end{BlindRegion}
+
+\chapter{Biography}\label{app:biography}
+
+\begin{BlindRegion}
+... paragraphs ...
+\end{BlindRegion}
+\end{verbatim}
+Or, such short text can be put in the \mana{BlindText} macro:
+\begin{verbatim}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+# Id: pp.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{verbatim}
+Then, if option \optna{Blind} is selected, the enclosed text is hidden, otherwise shown as normal.
+At least
+\begin{enumerate}
+\item the {\em Acknowledgements} chapter,
+\item the publication list, and
+\item the {\em Biography} appendix
+\end{enumerate}
+must be enclosed in the blind regions.
+There are also other places that the author information can occur,
+for example, in the copyright declaration of your implementation code.
+
+While the \optna{Blind} option disables the emphasis of author names in the bibliography, including the \mana{bibentry} items,
+the {\textsc{Bib}\negthinspace\TeX} may not be able to recompile automatically,
+you need to remove all the auxiliary files to let the recompilation happen.
+
+\section{Preloaded Class and Packages}
+
+These {\LaTeX} class and packages are loaded by the template:\\
+\verb|[12pt,a4paper]{book}|,\\
+\verb|{geometry}|,
+\verb|[T1]{fontenc}|,
+\verb|{CJKutf8}|,
+\verb|{amsmath,amsthm,amssymb}|,
+\verb|{mathtools}|,\\
+\verb|{makecell}|,
+\verb|{array}|,
+\verb|{bm}|,\\
+\verb|[dvipsnames,x11names,svgnames]{xcolor}|,
+\verb|[pdftex]{hyperref}|,\\
+\verb|{multirow,multicol}|,
+\verb|{wrapfig}|,
+\verb|{graphicx}|,
+\verb|{caption,subcaption}|,\\
+\verb|[style=long4col,toc,automake]{glossaries}|,
+\verb|[noindentafter]{titlesec}|,
+\verb|{titletoc}|,
+\verb|{tocbibind}|,
+\verb|{notoccite}|,
+\verb|{setspace}|,
+\verb|{fancyhdr}|,
+\verb|{etoolbox}|,
+\verb|{stmaryrd}|,
+\verb|{marvosym}|,
+\verb|[en-GB,calc]{datetime2}|,
+\verb|{varwidth}|,
+\verb|{keyval}|,
+\verb|{qrcode}|, and
+\verb|{bibentry}|.
+
+A few packages are optionally loaded:\\
+\verb|{eso-pic}| (option \optna{Hardback}),
+\verb|{fgruler}| (option \optna{Review}), and
+\verb|{comment}| (option \optna{Blind}).
+
+\section{History}
+
+\DTMsetstyle{en-GB}
+\DTMlangsetup{showdayofmonth=true,ord=raise}
+\newcommand{\VDT}[2]{v#1 $\bullet$ \DTMdate{#2}}
+
+\paragraph{\VDT{7.8.1}{2026-05-06}}
+	\begin{itemize}[noitemsep]
+        \item Fix a typo;
+	\end{itemize}
+
+\paragraph{\VDT{7.8}{2026-04-20}}
+	\begin{itemize}[noitemsep]
+        \item Add Traditional Chinese title/abstract/keyword support: \\
+            \mana{ChtTitle}, \mana{ThesisChtKeywords}, \mana{ChtKeywords}, and environment \optna{ChtAbstract};
+	\end{itemize}
+
+\paragraph{\VDT{7.7}{2026-03-27}}
+	\begin{itemize}[noitemsep]
+        \item Replace line numbers with side rulers;
+
+        \item Add the \optna{Blind} option, together with \optna{BlindRegion} and \mana{BlindText} to support double-blind peer review;
+
+        \item Add the \mana{CoSupervisor} and \mana{InsertCoSupervisor} commands to set and display the official co-supervisor of a student, if any;
+
+        \item Add macros about this thesis class --- version number, release date, and display code;
+	\end{itemize}
+
+\paragraph{\VDT{7.6}{2026-03-06}}
+	\begin{itemize}[noitemsep]
+        \item Add Simplified Chinese title/abstract/keyword support: \\
+            \mana{ChsTitle}, \mana{ThesisChsKeywords}, \mana{ChsKeywords}, and environment \optna{ChsAbstract};
+
+        \item Add a thesis skeleton, with brief descriptions of what are expected in the individual chapters;
+	\end{itemize}
+
+\paragraph{\VDT{7.5}{2025-10-10}}
+	\begin{itemize}[noitemsep]
+        \item fix the missing package bug with the \optna{Hardback} option;
+
+        \item Pack all logos into one PDF file and use page selection in \mana{includegraphics} to load individual logos;
+
+        \item Add a research proposal skeleton, with brief descriptions of what are expected in the individual chapters;
+	\end{itemize}
+
+\paragraph{\VDT{7.4}{2025-09-30}}
+	\begin{itemize}[noitemsep]
+        \item options to include and integrate various algorithm packages: {\tt algorithm}, {\tt algorithmic}, {\tt algorithmicx}, {\tt algpseudocode}, {\tt algorithm2e} and {\tt mathpartir};
+
+        \item new {\tt sample-algo.tex} to test the included algorithm packages;
+	\end{itemize}
+
+\paragraph{\VDT{7.3}{2025-09-18}}
+	\begin{itemize}[noitemsep]
+        \item new (\optna{Review} mode) class option \optna{Screen} (opposite: \optna{Print}) to turn off odd/even page margin difference, better for screen display;
+
+        \item new sample thesis modified from a real published paper to show more {\LaTeX} type setting examples;
+
+        \item restart line numbers from 1 for every page;
+
+        \item add a chapter to list the document class options and the commands provided;
+
+        \item move the version history to the above chapter;
+
+        \item fix some {\tt lineno} issues in display math, and extend line numbers to appendices;
+	\end{itemize}
+
+\paragraph{\VDT{7.2}{2025-08-13}}
+	\begin{itemize}[noitemsep]
+        \item new set of panel member definitions for joint-degree programmes, \\
+            \mana{PanelChair} \\
+            \mana{PanelExternal} or \mana{PanelExternalA} \\
+            \mana{PanelJointExternal} or \mana{PanelExternalB} \\
+            \mana{PanelInternal} or \mana{PanelInternalA} or \mana{PanelExaminer} or \mana{PanelExaminerA} \\
+            \mana{PanelJointInternal} or \mana{PanelInternalB} or \mana{PanelExaminerB};
+		\item fine tune the logos for joint programme;
+		\item adjust signature page;
+        \item remove the MPI glossary;
+	\end{itemize}
+
+\paragraph{\VDT{7.1}{2025-06-19}}
+
+	\begin{itemize}[noitemsep]
+		\item add \mana{PanelExaminerC} and \mana{PanelExaminerD} for joint programme;
+		\item adjust signature page;
+	\end{itemize}
+
+\paragraph{\VDT{7.0}{2025-06-16}}
+	\begin{itemize}[noitemsep]
+		\item add \mana{InsertUniversity} and \mana{InsertJointUniversity};
+		\item add \mana{JointSupervisor} for use with joint programme;
+		\item adjust the font size and rewrite the statement from the cover page;
+		\item refine ``mpThesis.cls'';
+	\end{itemize}
+
+\paragraph{\VDT{6.4}{2025-05-23}}
+	\begin{itemize}[noitemsep]
+		\item provide descriptions and examples for various options of ``mpThesis'';
+		\item address the code for entering long name of author/title/programme;
+		\item Co-supervisor will not be showed;
+		\item add \mana{InsertAcademicShort} for the use of ThesisNumber;
+		\item add \mana{InsertProgrammeCode} for the use of ThesisNumber;
+	\end{itemize}
+
+\paragraph{\VDT{6.3}{2025-05-21}}
+	\begin{itemize}[noitemsep]
+		\item add options of \optna{PCOM}, \optna{PAIDD}, \optna{PETI} for Ph.D. programmes;
+		\item add option of \optna{JUC}, \optna{JUB} for joint programmes;
+		\item resize/adjust the MPU logo(s) in FrontMatter;
+		\item providing the UC logo for the use of FCA-JUC programme;
+		\item rewrite the definition of ``font families'' in .cls;
+		\item rewrite the definition of ``thesis types'' in .cls;
+		\item rewrite the definition of ``produce modes'' in .cls;
+		\item rewrite the of \textbf{ACKNOWLEDGMENTS};
+	\end{itemize}
+
+\paragraph{\VDT{6.2}{2024-03-25}}
+	\begin{itemize}[noitemsep]
+		\item enable ``x11names'' from package ``xcolor'';
+		\item redraw MPU-FCA-logo.pdf;
+	\end{itemize}
+
+\paragraph{\VDT{6.1}{2025-04-03}}
+	\begin{itemize}[noitemsep]
+		\item use CalliCover as the default \optna{Hardback} paper;
+	\end{itemize}
+
+\paragraph{\VDT{6.0}{2023-03-24}}
+	\begin{itemize}[noitemsep]
+		\item add \optna{Hardback} option for final printing;
+		\item add ``copyright page'' in between ``cover page'' and ``title page'';
+		\item redesign ``cover page'', ``title page'', and ``declaration page'';
+		\item ``declaration page'' is created as a *.tex file and is allowed to be modified;
+		\item \mana{DefenceDate}, \mana{PanelChair}, \mana{PanelExternal} and \mana{PanelExaminer} information needs to be entered;
+		\item supports optional long title names (with line break) to be displayed on the copyright page only;
+		\item a template of ``Author Biography'' is provided;
+		\item make font ``Libertine'' and cover ``CalliCover'' the default;
+		\item move ``Ethics Checklist'' to appendix;
+		\item latex (macros) code refinement;
+	\end{itemize}
+
+\paragraph{\VDT{5.9}{2023-01-06}}
+	\begin{itemize}[noitemsep]
+		\item support ``subsubsection'' indexing;
+		\item ``notoccite'' package is enabled by default in ``mpThesis.cls'';
+	\end{itemize}
+
+\paragraph{\VDT{5.8}{2023-01-04}}
+	\begin{itemize}[noitemsep]
+		\item a blank page has been added at the end of thesis;
+		\item fixed issue from package ``glossaries'';
+		\item fixed template mark displaying in ``Final'' mode, now only on the back of the cover page;
+		\item added the \optna{DoubleSpacing} option to enable double spacing when needed, the default is one-half spacing;
+		\item added the \optna{NoTocCite} option to include the ``notoccite'' package to prevent the numbering of bibliography from being affected by the citations in TOC;
+	\end{itemize}
+
+\paragraph{\VDT{5.7}{2022-10-27}}
+	\begin{itemize}[noitemsep]
+		\item restrict package ``glossaries'' using version 4.46;
+		\item define the (\gls{MPU} and MPI glossary by default to eliminate the quirk in the ``glossaries'' package;
+		\item determine double-spacing in mainMatter;
+		\item increase TOC depth level to 2;
+		\item show the ``url'' and ``doi'' items in the ``mpUnsrt'' style.
+		\item a sample of ``publication list'' is provided in Chapter 1;
+		\item section refinement in Chapter 1 to Chapter 3;
+		\item adjust ``citecolor'';
+	\end{itemize}
+
+\paragraph{\VDT{5.6}{2022-09-22}}
+	\begin{itemize}[noitemsep]
+		\item made ``List of Figures/Tables/Algorithms/Abbreviations'' optional;
+		\item adjusted the position of the example section;
+		\item provided more advanced examples;
+		\item reformatted section ``Template Versioning'';
+		\item release to canvas;
+	\end{itemize}
+
+\paragraph{\VDT{5.5}{2022-09-20}}
+	\begin{itemize}[noitemsep]
+		\item added ``List of Algorithms'';
+		\item provided an example of algorithm in Chapter 4;
+		\item added optional long name (with line breaks) support, including student names and programme names, shown only on the title page;
+		\item \optna{NoToC} option;
+		\item adjusted the vertical position of the Chinese calligraphic MPU logo in page headers;
+		\item adjusted vertical spacing of the table on the title page;
+	\end{itemize}
+
+\paragraph{\VDT{5.4}{2022-09-15}}
+	\begin{itemize}[noitemsep]
+		\item refined title page;
+		\item adjusted spacing;
+		\item added Chinese MPU logo (in .pdf);
+		\item redesigned header format;
+	\end{itemize}
+
+\paragraph{\VDT{5.3}{2022-09-13}}
+	\begin{itemize}[noitemsep]
+		\item refined format of ``mpUnsrt.bst'';
+		\item added emphasized authors support to ``mpUnsrt.bst'';
+		\item improved TOC macros;
+	\end{itemize}
+
+\paragraph{\VDT{5.2}{2022-09-06}}
+	\begin{itemize}[noitemsep]
+		\item added reference style ``mpUnsrt.bst'';
+		\item added more font families;
+		\item disposed ``IndentFirst'';
+		\item improved template manuals;
+		\item make minitoc singlespacing;
+		\item provided two types of \optna{Thesis} or \optna{Proposal}, \optna{Thesis} is default;
+		\item provided two modes of \optna{Review} or \optna{Final}, \optna{Review} is default;
+		\item \optna{Review} mode shows hyperlinks and line numbers;
+		\item \optna{Final} mode removes line numbers, no color for hyperlinks;
+		\item minor font size adjustment;
+		\item added template version marks to even pages;
+	\end{itemize}
+
+\paragraph{\VDT{5.1}{2022-09-02}}
+	\begin{itemize}[noitemsep]
+		\item Overleaf online tested;
+		\item online version refinement;
+		\item made ``IndentFirst'' optional;
+		\item redefined the cross-reference prefix;
+		\item aligned list of abbreviations;
+	\end{itemize}
+
+\paragraph{\VDT{5.0}{2022-08-29}}
+	\begin{itemize}[noitemsep]
+		\item major revision;
+		\item item definition of template classes and refinement of \LaTeX{} code;
+		\item regeneration of MPU logo;
+		\item provide more font family;
+		\item an example about profile updating is provided;
+	\end{itemize}
+
+\paragraph{\VDT{4.8}{2022-08-24}}
+	\begin{itemize}[noitemsep]
+		\item add mini-tables-of-contents in each chapter;
+		\item move ``Acknowledgments'' to frontmatter;
+		\item add ``List of Abbreviations'';
+		\item provide an example of adding glossary in Chapter 3;
+		\item add the section of ``Template Versioning'' in Chapter 6;
+		\item the first indent have been changed to default;
+		\item latex (macros) code refinement;
+	\end{itemize}
+
+\paragraph{\VDT{4.2}{2022-03-08}}
+	\begin{itemize}[noitemsep]
+		\item add ``Universidade Polit\'{e}cnica de Macau'' on the Cover page;
+		\item cover page redesign;
+		\item regenerate the optimized MPU loge;
+		\item refine TOC format;
+	\end{itemize}
+
+\paragraph{\VDT{4.1}{2022-03-04}}
+	\begin{itemize}[noitemsep]
+		\item appendix header correction;
+		\item section header alignment;
+	\end{itemize}
+
+\paragraph{\VDT{4.0}{2022-03-07}}
+	\begin{itemize}[noitemsep]
+		\item update ``MPI'' to ``MPU'';
+		\item update ``School'' to ``Faculty'';
+		\item adjust the size and position of the MPU logo.
+		\item formatting student ID: \optna{P-XX-XXXX-X};
+		\item change to use small cap format for the section header;
+		\item highlight fillable item;
+		\item few formatting adjustments;
+	\end{itemize}
+
+\paragraph{\VDT{3.7}{2021-11-26}}
+	\begin{itemize}[noitemsep]
+		\item dispose the front of ``Times New Roman'';
+		\item update title page;
+		\item provide the logo in PDF format;
+		\item few formatting adjustments;
+	\end{itemize}
+
+\paragraph{\VDT{3.5}{2021-04-13}}
+	\begin{itemize}[noitemsep]
+		\item update TOC's chapter and title;
+		\item update the chapter of ``Acknowledgements'';
+		\item provide an example of using equation in Chapter 1;
+		\item provide an example of using table in Chapter 2;
+		\item provide an example of adding figure in Chapter 3;
+		\item provide an example of using list in Chapter 5;
+		\item provide an example of citing literature in Chapter 5;
+		\item other minor adjust to format;
+	\end{itemize}
+
+\paragraph{\VDT{3.1}{2021-01-27}}
+	\begin{itemize}[noitemsep]
+		\item update cover paper statement;
+		\item change citation style to ieeetr style;
+		\item remove chinese abstract;
+		\item few formatting adjustments;
+	\end{itemize}
+
+\paragraph{\VDT{3.0}{2021-01-15}}
+	\begin{itemize}[noitemsep]
+		\item format TOC;
+		\item change first indent to 1.2cm;
+		\item change header/footer font size to 10;
+		\item other adjustments;
+	\end{itemize}
+
+\paragraph{\VDT{2.3}{2021-01-07}}
+	\begin{itemize}[noitemsep]
+		\item supported chinese abstract;
+		\item adjust TOC;
+	\end{itemize}
+
+\paragraph{\VDT{2.1}{2021-01-06}}
+	\begin{itemize}[noitemsep]
+		\item update cover pager;
+		\item design and formatting;
+	\end{itemize}
+
+\paragraph{\VDT{1.0}{2021-01-04}}
+	\begin{itemize}[noitemsep]
+		\item first release;
+	\end{itemize}
+
+\makeatletter
+\let\ttdefault\ttdefault@save
+\makeatother
+\endinput
+
+%%
+%% $Id: Chapter7.tex 9221 2026-05-06 10:54:45Z wke@IPM.EDU.MO $

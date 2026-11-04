@@ -1,0 +1,728 @@
+\documentclass[PCOM,Thesis,Review]{mpThesis}
+
+\StudentName{Brianchon Pascal}
+\StudentNumber{P-12-1234-1}
+\Supervisor{Desargues Monge}
+%% joint supervisor
+% \JointSupervisor{<<Joint Supervisor>>}
+
+%% info for thesis defence examination
+\ThesisNumber{9876}{\InsertProgrammeCode}{\InsertAcademicShort}{pascal}{sample}
+% the word `sample' here can be replaced with any word related to the content of this proposal.
+\DefenceDateTime{9876-01-02}{23:59:00} % Oral Examination Date (YYYY-MM-DD), and Time (hh:mm:ss)
+\PanelChair{<<Chair>>}
+\PanelExternal{<<External Examiner>>}
+\PanelInternalA{<<Internal Examiner A>>}
+\PanelInternalB{<<Internal Examiner B>>}
+%%
+
+\Title%
+[A Thesis \\ Skeleton]% for binder
+{A Thesis Skeleton}
+
+\ChsTitle%
+{论文框架}
+\ChtTitle%
+{論文框架}
+
+\ThesisKeywords{%
+  thesis,
+  skeleton,
+  outline}
+\ThesisChsKeywords{%
+  论文、
+  框架、
+  提纲}
+\ThesisChtKeywords{%
+  論文、
+  框架、
+  提綱}
+
+\Date{\InsertThesisClassDate} %Submission Date (YYYY-MM-DD)
+
+\EmphasizeAuthors{emphasized/author/list/3}
+\bibliographystyle{mpUnsrt.bst}
+
+%% the Remark environment
+\newif\ifShowRemarks
+\newcommand{\ShowRemarks}{\ShowRemarkstrue}
+\newcommand{\HideRemarks}{\ShowRemarksfalse}
+\ShowRemarks % \HideRemarks hides the remarks.
+\NewDocumentEnvironment{Remark}{+b}{\ifShowRemarks\color{Teal}#1\fi}{}
+\newcommand{\Hd}[1]{{\color{SteelBlue}\bf#1.}}
+%%
+
+\begin{document}
+%%
+%%
+\begin{FrontMatter}[FigLs=true,TabLs=true,AlgoLs=false,AbbreLs=true]
+%%
+\input{Declaration.tex}
+
+%%
+\chapter{Abstract}
+
+\begin{Remark}
+The abstract of a thesis is a concise, self-contained summary of the entire research work.
+It serves as the first—and often the only—part that readers engage with, so it must clearly convey the essence of the thesis.
+A good abstract typically includes:
+\begin{enumerate}
+\item \Hd{Background/Context}
+A brief introduction to the problem domain and why it matters.
+
+\item \Hd{Problem Statement}
+The specific gap or challenge the research addresses.
+
+\item \Hd{Objective/Contribution}
+The main goal and novelty of the work (e.g., new algorithm, framework, or theoretical insight).
+
+\item \Hd{Methodology}
+A short description of the approach, tools, or datasets used.
+
+\item \Hd{Results/Findings}
+Key outcomes, ideally with quantitative evidence.
+
+\item \Hd{Conclusion/Implications}
+The significance of the findings and potential applications or future directions.
+\end{enumerate}
+When writing a thesis abstract, keep it concise and structured, moving logically from context to problem, contribution, method, results, and implications.
+Highlight the novelty of your work by clearly stating what is new --- whether an algorithm, framework, or theoretical insight ---
+and support your claims with quantitative results such as accuracy improvements or performance gains.
+Use clear, accessible language, ensuring each sentence adds meaningful information.
+Draft the abstract after completing the thesis so you can summarize the work accurately, and polish it carefully for clarity, brevity, and impact.
+\end{Remark}
+
+\Keywords{\InsertThesisKeywords}
+
+\begin{ChsAbstract}
+\begin{Remark}
+中文摘要应与英文摘要一致。
+撰写中文摘要的目的是方便论文被中文文献数据库索引。
+\end{Remark}
+\end{ChsAbstract}
+
+\ChsKeywords{\InsertThesisChsKeywords}
+
+\begin{ChtAbstract}
+\begin{Remark}
+中文摘要應與英文摘要一致。
+撰寫中文摘要的目的是方便論文被中文文獻數據庫索引。
+\end{Remark}
+\end{ChtAbstract}
+
+\ChtKeywords{\InsertThesisChtKeywords}
+
+%%
+\chapter{Acknowledgments}
+
+\begin{Remark}
+The Acknowledgments section of a doctoral thesis serves a very particular purpose.
+It is the one part where you can step outside the strictly academic voice and express gratitude to those who supported you along the way.
+Its role is to recognize contributions ---
+whether intellectual, financial, technical, or emotional ---
+that made your research possible.
+While the rest of the thesis is focused on presenting original scholarship,
+the acknowledgment is about honoring the network of people and institutions behind that achievement.
+
+Acknowledgments should be written in a formal yet warm tone.
+They are not meant to be overly casual or filled with private anecdotes, but they also don't need to be as rigidly academic as the main chapters.
+Striking a balance is the key ---
+you want sincerity without exaggeration, professionalism without detachment.
+Typically, this section is written in the first person, and it runs one to two pages.
+The language should be clear, respectful, and measured, avoiding both excessive detail and vague generalities.
+
+Typical acknowledgments flow from formal to personal.
+\begin{enumerate}
+\item \Hd{Supervisors and Advisors}
+Thank your primary supervisor(s) for guidance, mentorship, and intellectual support. Mention co-supervisors or committee members who provided feedback.
+
+\item \Hd{Funding and Institutional Support}
+Acknowledge grants, scholarships, fellowships, or research funding bodies. Mention your university, department, and any labs or research centers.
+
+\item \Hd{Collaborators and Colleagues}
+Recognize lab mates, research partners, or collaborators in projects. Include technical staff or administrative personnel who helped with logistics.
+
+\item \Hd{Family and Friends}
+Express gratitude for emotional support, patience, and encouragement. Keep this section warm but concise --- avoid overly personal details.
+
+\item \Hd{Broader Inspiration (Optional)}
+Some authors include a brief nod to communities, open-source contributors, or even philosophical influences that shaped their thinking in the field.
+\end{enumerate}
+
+There are several key guidelines to keep in mind.
+Be specific when naming individuals and institutions, and clarify the nature of their contribution.
+Group acknowledgments appropriately: institutions can be thanked collectively, while individuals deserve personal mention.
+Keep praise genuine but restrained, ensuring it doesn't read as overblown.
+Respect privacy by avoiding sensitive or overly personal details, and maintain consistency by using full names and titles for academic or professional figures.
+Above all, the acknowledgments should feel authentic, reflecting your gratitude without drifting into informality or unnecessary embellishment.
+\end{Remark}
+
+\end{FrontMatter}
+%%
+%%
+\begin{MainMatter}
+%%
+\chapter{Introduction}
+\label{ch:introduction}
+\minitoc
+
+\begin{Remark}
+The introduction chapter of a doctoral thesis is one of the most important sections because it sets the stage for the entire thesis.
+Its purpose is to orient the reader, establish the context of your research, and clearly articulate the problem you are addressing.
+A strong introduction not only explains what your study is about but also why it matters, situating your work within the broader academic landscape.
+It should provide enough background for readers unfamiliar with the specific topic while guiding experts toward the novelty and significance of your contribution.
+
+The introduction should be written in a clear, formal, and engaging manner.
+Unlike the abstract, which is concise and highly condensed, the introduction allows for more narrative flow.
+It should avoid jargon where possible, explain key concepts, and build a logical progression from general context to specific research questions.
+The tone must remain professional, but it should also be persuasive ---
+convincing the reader that the research problem is important and that your approach is justified.
+Length varies by discipline, but doctoral introductions are typically substantial, often spanning 15 -- 30 pages depending on the complexity of the topic.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Background and Context}
+Introduce the field, its current state, and why the topic matters.
+
+\item \Hd{Problem Statement}
+Define the specific issue or gap your research addresses.
+
+\item \Hd{Research Objectives/Questions/Hypotheses}
+State clearly what you aim to investigate.
+
+\item \Hd{Rationale and Significance}
+Explain why your study is important and how it contributes to knowledge.
+
+\item \Hd{Theoretical/Conceptual Framework}
+Present the lens or foundation guiding your analysis.
+
+\item \Hd{Methodological Overview}
+Briefly outline your approach (details come later in the methodology chapter).
+
+\item \Hd{Author's Achievements During Doctoral Study}
+Highlight publications, presentations, collaborations, or awards that demonstrate your scholarly progress.
+
+\item \Hd{Thesis Outline}
+Provide a roadmap of the chapters to help readers navigate the document.
+\end{enumerate}
+
+There are several key guidelines to follow when writing this chapter.
+Begin with a broad overview of the field to establish context, then narrow down to the specific problem your thesis addresses.
+Clearly state your research objectives, questions, or hypotheses, and explain their relevance.
+Provide a rationale for your study, showing how it fills a gap in existing knowledge or addresses a pressing issue.
+Outline the theoretical framework or conceptual lens guiding your work, and briefly preview the methodology if appropriate.
+Finally, give the reader a roadmap of the thesis structure, explaining how each chapter contributes to the overall argument.
+Throughout, maintain clarity, coherence, and logical flow, ensuring that each section builds toward the justification of your research.
+\end{Remark}
+
+%%
+\chapter{Preliminary}
+\label{ch:preliminary}
+\minitoc
+
+\begin{Remark}
+The preliminary chapter of a doctoral thesis is often the first substantial section after the introduction,
+and its purpose is to establish the foundation upon which the rest of the thesis is built.
+It provides the reader with essential background, definitions, and conceptual framing so that they can fully understand the research problem and the arguments that follow.
+This chapter is not about presenting new findings; rather, it is about preparing the intellectual ground ---
+clarifying the scope, situating the study within existing knowledge, and ensuring that readers have the necessary context before engaging with the core research.
+
+The preliminary chapter should be formal, precise, and explanatory.
+It is less argumentative than later chapters, but it must still demonstrate critical thinking and scholarly rigor.
+The tone should remain professional, avoiding unnecessary narrative flourishes, while ensuring clarity and accessibility.
+Since this chapter often deals with definitions, frameworks, and background information, the writing should be systematic and logically organized.
+Length varies by discipline, but it is typically substantial enough to cover all foundational aspects
+without overwhelming the reader with detail better suited for the literature review or methodology chapters.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Scope of the Study}
+Define boundaries, inclusions, and exclusions.
+
+\item \Hd{Definitions of Key Terms}
+Clarify terminology used throughout the thesis.
+
+\item \Hd{Conceptual/Theoretical Framework}
+Present the foundation guiding your analysis.
+
+\item \Hd{Background Information}
+Provide historical, social, or scientific context.
+
+\item \Hd{Assumptions and Limitations}
+State conditions, boundaries, or constraints of the study.
+
+\item \Hd{Transition to Next Chapter}
+Conclude with a bridge toward the literature review or methodology.
+\end{enumerate}
+
+There are several key guidelines to follow.
+First, clearly define the scope of your study --- what is included, what is excluded, and why.
+Provide definitions of key terms and concepts, especially if they are contested or used in a specific way in your research.
+Establish the theoretical or conceptual framework that underpins your study, explaining how it guides your analysis.
+Offer a concise overview of the historical, social, or scientific background relevant to your topic, but avoid duplicating the literature review.
+If your discipline requires it, include a statement of assumptions, limitations, or delimitations that clarify the boundaries of your work.
+Finally, ensure that the chapter flows logically into the subsequent sections, acting as a bridge between the introduction and the detailed literature review or methodology.
+\end{Remark}
+
+%%
+\chapter{Literature Review}
+\label{ch:literature}
+\minitoc
+
+\begin{Remark}
+The literature review chapter of a doctoral thesis is one of the most critical components.
+Its purpose is to demonstrate your mastery of the field, situate your research within existing scholarship, and justify the need for your study.
+Unlike the introduction, which sets the stage broadly, the literature review provides a detailed and critical examination of prior work,
+showing how your research builds upon, diverges from, or fills gaps in the existing body of knowledge.
+It is not simply a summary of what others have written; it is an analytical synthesis that establishes the intellectual foundation for your thesis.
+
+The literature review should be formal, analytical, and well-structured.
+It must go beyond listing sources to evaluate them critically, highlighting strengths, weaknesses, and debates in the field.
+The tone should remain professional, avoiding overly descriptive or narrative writing.
+Instead, focus on thematic organization and logical progression, guiding the reader through the scholarly landscape.
+Clarity and coherence are essential, as the review often spans many pages and covers diverse perspectives.
+Citations must be accurate and consistent, reflecting the conventions of your discipline.
+Above all, the style should demonstrate your authority as a researcher who understands the field deeply and can position your work within it.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Introduction to the Literature Review}
+State the purpose, scope, and organization of the chapter.
+
+\item \Hd{Thematic/Chronological/Methodological Sections}
+Organize existing scholarship in a logical way.
+
+\item \Hd{Critical Evaluation of Sources}
+Assess strengths, weaknesses, and gaps in the literature.
+
+\item \Hd{Identification of Debates and Trends}
+Highlight key controversies, developments, or shifts in the field.
+
+\item \Hd{Connection to Research Questions}
+Show how the literature leads to your study's objectives.
+
+\item \Hd{Summary and Transition}
+Conclude with a synthesis that justifies your research and bridges to the problem formulation/methodology chapter.
+\end{enumerate}
+
+There are several key guidelines to follow.
+Begin by defining the scope of your review --- what bodies of literature are relevant and why.
+Organize the chapter thematically, chronologically, or methodologically, depending on what best suits your topic.
+Critically evaluate sources rather than merely summarizing them, pointing out gaps, inconsistencies, or unresolved questions.
+Show how different strands of research connect or diverge, and identify the debates that shape the field.
+Integrate your own perspective, making clear how your study responds to or extends existing work.
+Ensure that the review leads logically to your research questions, demonstrating the necessity of your study.
+Finally, maintain a balance between breadth and depth: cover the major works comprehensively, but engage deeply with the most relevant ones.
+\end{Remark}
+
+%%
+\chapter{Problem Formulation}
+\label{ch:problem}
+\minitoc
+
+\begin{Remark}
+The problem formulation chapter of a doctoral thesis is the intellectual core of your work.
+Its purpose is to clearly articulate the research problem, explain why it is significant, and define the precise questions or hypotheses your study will address.
+This chapter transforms the broad context and background provided in earlier sections into a focused statement of the issue at hand.
+It is where you demonstrate that you have identified a genuine gap in knowledge or a pressing issue in practice, and that your research is designed to address it in a rigorous and meaningful way.
+
+This chapter should be formal, precise, and logically structured.
+Unlike the literature review, which surveys existing scholarship, the problem formulation chapter distills that knowledge into a clear statement of the research problem.
+The tone should be authoritative yet accessible, avoiding unnecessary jargon while maintaining academic rigor.
+Clarity is paramount: the reader should come away with a precise understanding of what problem you are tackling, why it matters, and how your study is positioned to solve it.
+This chapter is often shorter than the literature review but must be tightly argued and coherent.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Restatement of Context}
+Briefly revisit the background and literature to set the stage.
+
+\item \Hd{Identification of the Gap/Issue}
+Highlight what is missing, unresolved, or problematic in current knowledge or practice.
+
+\item \Hd{Problem Statement}
+Formulate the central research problem in clear, precise terms.
+
+\item \Hd{Research Questions/Hypotheses}
+Define the specific questions or hypotheses derived from the problem.
+
+\item \Hd{Scope and Boundaries}
+Clarify what aspects of the problem are included and excluded.
+
+\item \Hd{Justification and Significance}
+Explain why the problem matters and how your study contributes to addressing it.
+
+\item \Hd{Transition to Methodology}
+Conclude by linking the problem formulation to the research design.
+\end{enumerate}
+
+There are several key guidelines to follow.
+Begin by restating the broader context of your research, drawing on the literature review to show where gaps or unresolved issues exist.
+Narrow this down to the specific problem your thesis addresses, making sure it is framed as both important and researchable.
+Clearly articulate your research questions or hypotheses, ensuring they are logically derived from the problem statement.
+Explain the scope of the problem --- what aspects you are focusing on and what you are deliberately excluding.
+Justify your formulation by showing how it advances knowledge, addresses practical needs, or contributes to theoretical debates.
+Finally, ensure that the problem formulation flows naturally into the methodology chapter, where you will explain how you intend to investigate the problem.
+\end{Remark}
+
+%%
+\chapter{Methodology}
+\label{ch:method}
+\minitoc
+
+\begin{Remark}
+The methodology chapter of a doctoral thesis is the section where you demonstrate the rigor and credibility of your research approach.
+Its purpose is to explain in detail how you designed, implemented, and validated your study,
+ensuring that readers can understand, evaluate, and potentially replicate your work.
+In computer science and AI, this chapter is particularly crucial because research often involves complex algorithms, large datasets, and computational experiments.
+By carefully documenting your methodology, you show that your findings are not only innovative but also grounded in systematic and transparent procedures.
+
+The style of this chapter should be formal, precise, and highly technical, while still maintaining clarity.
+Unlike the literature review, which is discursive and analytical, the methodology is explanatory and procedural.
+Every methodological choice must be justified, not simply described.
+For example, if you select a particular neural network architecture, you should explain why it is suitable for your problem,
+how it compares to alternatives, and what theoretical or practical considerations guided your decision.
+The writing should be detailed enough to allow replication, but avoid overwhelming the reader with raw implementation details that belong in appendices or supplementary materials.
+The tone should convey authority and confidence, showing that your methods are both scientifically sound and aligned with best practices in AI and computer science research.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Introduction to Methodology}
+Restate research questions and explain the purpose of the chapter.
+
+\item \Hd{Research Design}
+Define the overall approach (experimental, applied, theoretical).
+
+\item \Hd{Algorithms and Models}
+Describe chosen methods, architectures, and theoretical foundations.
+
+\item \Hd{Datasets and Data Preparation}
+Detail sources, preprocessing, and ethical considerations.
+
+\item \Hd{Implementation Details}
+Specify tools, frameworks, and hardware used.
+
+\item \Hd{Experimental Setup}
+Explain design of experiments, baselines, and parameter settings.
+
+\item \Hd{Evaluation Metrics}
+Define and justify performance measures.
+
+\item \Hd{Validation and Reliability}
+Show how rigor and robustness were ensured.
+
+\item \Hd{Ethical and Practical Considerations}
+Discuss fairness, transparency, and compliance.
+
+\item \Hd{Limitations of Methodology}
+Acknowledge constraints and mitigation strategies.
+
+\item \Hd{Progressive Methodology Chapters}
+If appropriate, divide into multiple connected chapters (e.g., data, models, evaluation) to reflect the iterative workflow.
+
+\item \Hd{Transition to Results Chapter}
+Bridge to the findings and analysis.
+\end{enumerate}
+
+When writing this chapter, there are several key guidelines to follow.
+Begin with an overview of your research design, explaining whether your study is experimental, applied, theoretical, or a combination,
+and why this design is appropriate for your research questions.
+Then, describe the algorithms and models you used, including mathematical formulations, architectures, and theoretical foundations.
+In AI research, this might involve detailing the structure of a deep learning model, the reinforcement learning framework applied, or the optimization techniques employed.
+Next, provide a thorough account of the datasets you used, including their sources, preprocessing steps, and any augmentation or synthetic data generation.
+It is important to discuss issues of representativeness, bias, and ethical considerations, since these are increasingly central in AI research.
+You should also include implementation details, specifying programming languages, libraries, frameworks, and hardware used,
+as reproducibility in computational research depends on these factors.
+
+The chapter should then explain your experimental setup, including training and testing splits, hyperparameter tuning strategies, baselines, and control conditions.
+This section demonstrates that your experiments were designed systematically and that your results are not accidental.
+Following this, describe the evaluation metrics you used to assess performance, such as accuracy, precision, recall, F1-score, BLEU, or computational efficiency,
+and justify why these metrics are appropriate for your problem.
+Discuss how you ensured the reliability and validity of your results, for example through cross-validation, ablation studies, or statistical significance testing.
+Ethical and practical considerations should also be addressed, including fairness, transparency, explainability, and compliance with data protection standards.
+Finally, acknowledge the limitations of your methodology, such as constraints in dataset size, computational resources, or generalizability, and explain how you mitigated these issues.
+The chapter should conclude by linking your methodology to the forthcoming results, showing how your carefully designed approach leads directly to the findings you will present.
+
+For computer science and AI theses, it is often appropriate to allow multiple methodology chapters that are progressively connected.
+This reflects the iterative and layered nature of research in these fields.
+For example, one chapter might focus on data collection and preprocessing, another on model design and training, and a third on evaluation and validation.
+Each chapter builds upon the previous one, creating a coherent methodological progression that mirrors the actual workflow of your research.
+This structure not only makes the thesis more readable but also emphasizes the logical development of your methods.
+By organizing the methodology into connected chapters, you can provide deeper detail in each area without overwhelming the reader in a single monolithic section.
+It also allows you to highlight the evolution of your approach, showing how initial design choices led to refinements and ultimately to the final experimental setup.
+\end{Remark}
+
+%%
+\chapter{Results and Discussion}
+\label{ch:pre-result}
+\minitoc
+
+\begin{Remark}
+The results and discussion chapter of a doctoral thesis is where you bring together the evidence from your experiments and the interpretation that makes those results meaningful.
+Its purpose is twofold: first, to present the outcomes of your research in a clear and systematic way,
+and second, to analyze and interpret those outcomes in relation to your research questions, hypotheses, and the broader scholarly context.
+This chapter is often the most substantial in the thesis because it demonstrates not only what you found but also how those findings contribute to knowledge in computer science and AI.
+
+The style of this chapter should be formal, precise, and analytical.
+The results section must remain objective, presenting data without speculation, while the discussion section should be interpretive, connecting the findings to your research aims and the literature.
+In computer science and AI, results are often highly quantitative ---
+performance metrics, comparative benchmarks, error rates, efficiency measures ---
+and should be presented with clarity using tables, figures, and graphs.
+The discussion then moves beyond the numbers, explaining why the results matter, how they compare to existing work, and what implications they have for theory, practice, or future research.
+The tone should convey authority and critical insight, showing that you can not only generate results but also understand their significance in the broader context of AI research.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Introduction to Results and Discussion}
+Restate research questions and objectives.
+
+\item \Hd{Results Presentation}
+Provide quantitative and qualitative findings, organized by experiment or dataset.
+
+\item \Hd{Visualizations and Comparative Analysis}
+Use figures and tables to show performance and compare against baselines or state-of-the-art methods.
+
+\item \Hd{Progressive Results Sections/Chapters}
+If appropriate, divide into multiple connected sections (e.g., dataset-level, model-level, evaluation-level).
+
+\item \Hd{Discussion of Findings}
+Interpret results in relation to research questions, hypotheses, and literature.
+
+\item \Hd{Contributions and Implications}
+Highlight how your work advances knowledge or practice in AI.
+
+\item \Hd{Unexpected Outcomes}
+Report anomalies and offer possible explanations.
+
+\item \Hd{Robustness and Reliability}
+Discuss validation, ablation studies, and statistical significance.
+
+\item \Hd{Ethical and Practical Considerations}
+Address fairness, bias, transparency, and explainability.
+
+\item \Hd{Limitations and Future Directions}
+Acknowledge constraints and suggest areas for further research.
+
+\item \Hd{Summary and Transition}
+Conclude with a synthesis of key contributions, leading into the final conclusion chapter.
+\end{enumerate}
+
+When writing this chapter, several guidelines are essential.
+Begin with a brief overview that reminds the reader of the research questions or hypotheses, anchoring the results to your objectives.
+Present your findings in a structured way, often organized by experiment, dataset, or research question.
+For each set of results, provide the necessary quantitative or qualitative data, such as accuracy, precision, recall, F1-score, BLEU score, or computational efficiency.
+Use visualizations --- graphs, confusion matrices, ROC curves, or learning curves ---
+to illustrate performance trends and highlight important aspects of your findings.
+Comparative analysis is especially important: show how your approach performs relative to baselines, state-of-the-art methods, or alternative algorithms.
+If your research involved multiple stages or progressively connected methods, structure the results into multiple sections or even separate chapters, reflecting the iterative nature of AI research.
+This allows you to present dataset-level results, model-level performance, and evaluation across different tasks or domains in a coherent progression.
+
+The discussion section should then interpret these findings.
+Explain how the results answer your research questions, whether they confirm or challenge your hypotheses, and how they align with or diverge from existing literature.
+Highlight the contributions of your work, showing how it advances knowledge or practice in computer science and AI.
+Address anomalies or unexpected outcomes transparently, offering possible explanations and considering their implications.
+Discuss robustness and reliability, drawing on validation techniques such as cross-validation, ablation studies, or statistical significance testing.
+Ethical and practical considerations should also be integrated into the discussion, especially in AI research where fairness, bias, and explainability are critical.
+Finally, acknowledge the limitations of your results and interpretation, such as constraints in dataset diversity, computational resources, or generalizability,
+and suggest directions for future research.
+Conclude the chapter with a synthesis that emphasizes the key contributions of your study and prepares the reader for the final conclusions.
+\end{Remark}
+
+%%
+\chapter{Conclusion}
+\label{ch:conclusion}
+\minitoc
+
+\begin{Remark}
+The conclusion chapter of a doctoral thesis is the final opportunity to demonstrate the significance of your research and to leave a lasting impression on the reader.
+Its purpose is to synthesize the entire study, highlight the contributions you have made, and reflect on the broader implications of your work.
+Unlike the results and discussion chapters, which focus on presenting and interpreting data,
+the conclusion distills the essence of the thesis into a coherent narrative that emphasizes impact, limitations, and future directions.
+It should convince the reader that your research has advanced knowledge in the research field and that it opens pathways for further exploration.
+
+The style of the conclusion should be formal, clear, and reflective.
+It should avoid introducing new data or lengthy technical detail, focusing instead on synthesis and insight.
+The tone must be confident yet balanced, acknowledging both the strengths and limitations of your work.
+While the chapter should be concise compared to earlier sections, it must be substantial enough to capture the depth of your contributions.
+In computer science and AI, where research often involves iterative experimentation and complex systems,
+the conclusion should emphasize how your methods and findings contribute to theory, practice, or applications, and how they fit into the evolving landscape of AI research.
+
+Here is a typical breakdown of this chapter.
+\begin{enumerate}
+\item \Hd{Restatement of Research Problem and Objectives}
+Remind the reader of the central focus of the thesis.
+
+\item \Hd{Summary of Key Findings}
+Present the most important results in a concise synthesis.
+
+\item \Hd{Contributions of the Study}
+Highlight theoretical, methodological, and practical contributions.
+
+\item \Hd{Implications for the Research Field (Computer Science and AI)}
+Discuss how your work advances knowledge or practice.
+
+\item \Hd{Limitations of the Study}
+Acknowledge constraints and their impact on the research.
+
+\item \Hd{Future Research Directions}
+Suggest areas for further exploration and development.
+
+\item \Hd{Closing Statement}
+End with a strong synthesis of your thesis's overall significance.
+\end{enumerate}
+
+There are several key guidelines to follow.
+Begin by restating the research problem and objectives, reminding the reader of the central questions your thesis set out to answer.
+Summarize the main findings, focusing on the most significant results rather than repeating every detail.
+Highlight the contributions of your work, whether they are
+theoretical (new models, frameworks, or algorithms),
+methodological (novel approaches to experimentation or evaluation), or
+practical (applications, tools, or systems developed).
+Discuss the implications of your findings for the research field, showing how they advance knowledge, address existing gaps, or open new avenues for research.
+Acknowledge the limitations of your study honestly, explaining how constraints such as dataset diversity, computational resources, or generalizability may have affected your results.
+This demonstrates critical self-awareness and strengthens the credibility of your work.
+Finally, propose directions for future research, building on your findings and pointing toward unresolved questions, potential improvements, or new applications.
+Conclude with a strong closing statement that emphasizes the overall contribution of your thesis and its relevance to the broader community.
+\end{Remark}
+%%
+%%
+\end{MainMatter}
+%%
+%%
+\begin{BackMatter}
+\bibliography{Emphasized.bib,Bibliography.bib} %list emphasized names and styles in a separate bib, include when needed.
+\end{BackMatter}
+%%
+%%
+\begin{Appendix}
+%%
+
+%%
+\chapter{Appendix}
+\label{app:appendix}
+
+\begin{Remark}
+The appendices of a doctoral thesis serve as a repository for supplementary material that supports your research but is too detailed, technical, or extensive to include in the main chapters.
+Their purpose is to provide transparency, reproducibility, and completeness without disrupting the flow of the thesis.
+By placing certain materials in the appendices, you allow interested readers to explore the finer details while keeping the main text focused and accessible.
+In computer science and AI, appendices are particularly valuable because research often involves large datasets, complex algorithms, extensive code, and detailed experimental results
+that cannot be fully presented in the body of the thesis.
+
+The style of appendices should be formal, clear, and well-organized.
+Each appendix should be labeled (Appendix A, Appendix B, etc.) and titled to indicate its content.
+The writing should be concise and explanatory, providing enough context for readers to understand the material without requiring them to revisit the main chapters.
+Unlike the core thesis, appendices can include raw data, technical specifications, or extended tables, but they should still be presented in a professional format.
+Consistency in formatting --- such as using the same citation style, figure numbering, and table layout as the main text --- is important to maintain coherence across the document.
+
+Here lists the potential types of materials for computer science and AI appendices.
+\begin{enumerate}
+\item \Hd{Publication List (Mandatory)}
+A comprehensive list of journal articles, conference papers, posters, or technical reports produced during the doctoral period.
+
+\item \Hd{Datasets}
+Detailed descriptions of datasets used, including sources, preprocessing steps, and metadata.
+
+\item \Hd{Code and Algorithms}
+Key code snippets, pseudocode, or algorithmic specifications that support reproducibility.
+
+\item \Hd{Extended Experimental Results}
+Full tables of results, additional graphs, or detailed performance comparisons not included in the main text.
+
+\item \Hd{Hyperparameter Settings}
+Comprehensive lists of parameters used in training models, tuning experiments, or optimization processes.
+
+\item \Hd{System Architecture Details}
+Diagrams and specifications of hardware or software systems used in experiments.
+
+\item \Hd{Validation Studies}
+Supplementary results from cross-validation, ablation studies, or robustness checks.
+
+\item \Hd{User Studies or Surveys}
+Full questionnaires, raw responses, or detailed statistical analyses if human participants were involved.
+
+\item \Hd{Ethical Documentation}
+Consent forms, data usage agreements, or compliance statements relevant to AI research.
+
+\item \Hd{Supplementary Figures and Tables}
+Additional visualizations that provide deeper insight into the findings.
+\end{enumerate}
+
+There are several key guidelines to follow.
+First, only include material that directly supports your research; avoid adding unrelated or excessive content.
+Provide clear cross-references in the main chapters so readers know when to consult the appendices.
+Organize the appendices logically, grouping similar types of material together.
+For example, one appendix might contain datasets, another might include code snippets, and another might present extended experimental results.
+Ensure that sensitive or proprietary information is handled appropriately, with permissions noted if necessary.
+Finally, remember that appendices are part of the thesis and will be examined, so they should meet the same standards of clarity and professionalism as the main chapters.
+
+Most importantly, a publication list must be included as a required appendix.
+This list should detail all peer-reviewed articles, conference papers, posters, or technical reports produced during your doctoral studies.
+Even if some publications are not directly tied to the thesis, they demonstrate your scholarly output and are an essential part of your academic profile.
+\end{Remark}
+
+%%
+\chapter{Biography}
+\label{app:biography}
+
+\begin{Remark}
+The biography section of a doctoral thesis is a concise academic profile of the author.
+Its purpose is to give readers a clear picture of your background, research focus, and professional development during your doctoral journey.
+Unlike acknowledgements, which are personal and emotional, the biography is factual and professional.
+It highlights your identity as a researcher and situates your work within your broader academic trajectory.
+The biography is meant to effectively showcase your expertise and contributions.
+
+The style of the biography should be formal, clear, and modest.
+It is not a personal story but rather a structured academic summary.
+The tone should be confident but not boastful, presenting achievements factually.
+Length is usually one to two pages, and the writing should be organized in a logical progression ---
+starting with education, moving through doctoral research, and ending with professional activities or future directions.
+The emphasis goes to your academic training, research focus, collaborations, teaching, and professional experiences.
+
+Here lists the suggested content for a doctoral biography.
+\begin{enumerate}
+\item \Hd{Educational Background}
+Degrees, institutions, and areas of specialization.
+
+\item \Hd{Doctoral Research Focus}
+Summary of thesis topic and contributions.
+
+\item \Hd{Collaborations and Industry Links}
+Partnerships with labs, companies, or research groups.
+
+\item \Hd{Teaching and Academic Service}
+Courses taught, student supervision, peer-review activities.
+
+\item \Hd{Professional Achievements}
+Awards, fellowships, grants, or recognitions.
+
+\item \Hd{Future Research Interests}
+Areas you plan to explore beyond the thesis.
+
+\item \Hd{Professional Photo}
+A formal headshot included at the start of the biography.
+\end{enumerate}
+
+There are several key guidelines to follow.
+Begin with your educational background, noting degrees earned, institutions attended, and areas of specialization.
+Then, summarize your doctoral research, explaining the central theme of your thesis and its contributions to the field.
+Highlight collaborations, internships, or industry partnerships that shaped your research, as these demonstrate engagement beyond your own work.
+Teaching experience, supervision of student projects, or involvement in academic service such as reviewing or organizing workshops can also be included.
+Professional achievements --- such as awards, fellowships, or grants --- should be mentioned to show recognition of your work.
+Finally, outline your current research interests and potential future directions, positioning yourself within the broader AI and computer science community.
+This ensures that even without a publication list, your biography conveys a strong academic identity.
+
+It is increasingly common to include a professional photo in the biography section.
+This adds a personal touch and helps readers connect the research with the researcher.
+The photo should be formal, high-quality, and appropriate for academic contexts --- typically a headshot in professional attire, with a neutral background.
+Placement is usually at the beginning of the biography, aligned to the left or right of the text.
+The good inclusion of a photo enhances the professional presentation of the thesis.
+\end{Remark}
+%%
+%%
+\end{Appendix}
+%%
+%%
+\end{document}
+
+%%
+%% $Id: thesis-skel.tex 9105 2026-04-13 07:41:43Z wke@IPM.EDU.MO $

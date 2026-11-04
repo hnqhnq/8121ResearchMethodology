@@ -1,0 +1,1909 @@
+\chapter{Implementation Source Code}\label{app:source}
+
+\newcommand{\PyFile}[1]{{\raggedleft\color{Crimson}\ttfamily\bfseries\small#1\par}}
+
+\begin{center}
+Copyright {\textcopyright} 2021 Wei Ke and Ka-Hou Chan.
+\end{center}
+
+The type-checking and operational semantics of the pattern matching described in the thesis, as well as the test cases, are implemented in Python.
+The source code listed is licensed under GPL-3, see the license file in \autoref{app:GPL-3}.
+
+\section[Abstract syntax of all else]{Abstract syntax of this minimal oo language, except pattern matching}
+
+\PyFile{asx.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from collections import namedtuple
+
+PrintStmt = namedtuple('PrintStmt', ['args'])
+AssignStmt = namedtuple('AssignStmt', ['lexpr', 'expr'])
+IfStmt = namedtuple('IfStmt', ['expr', 'then_stmt', 'else_stmt'])
+WhileStmt = namedtuple('WhileStmt', ['expr', 'stmt'])
+BlockStmt = namedtuple('BlockStmt', ['stmts'])
+
+VarDecl = namedtuple('VarDecl', ['label', 'cla'])
+VarEnd = namedtuple('VarEnd', ['label'])
+
+VarExpr = namedtuple('VarExpr', ['label'])
+AttrExpr = namedtuple('AttrExpr', ['expr', 'label'])
+OpExpr = namedtuple('OpExpr', ['op', 'args'])
+NewExpr = namedtuple('NewExpr', ['cla'])
+AndExpr = namedtuple('AndExpr', ['left', 'right'])
+OrExpr = namedtuple('OrExpr', ['left', 'right'])
+
+Program = namedtuple('Program', ['block'])
+#
+# end of asx.py
+# Id: asx.py 4842 2021-11-14 17:09:57Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section[Abstract syntax of pattern matching]{Abstract syntax of this pattern matching}
+
+\PyFile{pattern.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from collections import namedtuple
+
+LabeledPattern = namedtuple('LabeledPattern', ['label', 'base'])
+PatternRef = namedtuple('PatternRef', ['label'])
+ClassPattern = namedtuple('ClassPattern', ['cla', 'attrs'])
+PatternConj = namedtuple('PatternConj', ['patterns'])
+PatternDisj = namedtuple('PatternDisj', ['patterns'])
+Case = namedtuple('Case', ['junc', 'stmt', 'extra'])
+MatchStmt = namedtuple('MatchStmt', ['expr', 'cas'])
+
+class Extra:
+    def __init__(self, extra = None):
+        self.extra = extra
+
+    def put(self, extra):
+        self.extra = extra
+
+    def get(self):
+        return self.extra
+#
+# end of pattern.py
+# Id: pattern.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Prety-printing of dictionaries}
+
+\PyFile{pp.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from collections import namedtuple
+
+PrfxPP = namedtuple('PrefixedPP', ['prefix', 'pp'])
+
+def pprint(s, name = None):
+    def pp(s, indent):
+        if isinstance(s, dict):
+            if s:
+                print('{')
+                for k, v in s.items():
+                    indent2 = indent+4
+                    print('{}{!r}: '.format(' '*indent2, k), end = '')
+                    pp(v, indent2)
+                print(' '*indent+'}')
+            else:
+                print('{}')
+        else:
+            print('{!r}'.format(s))
+
+    if type(s) is PrfxPP:
+        p, t = s
+        if p:
+            if name:
+                print('{} {}: '.format(p, name), end = '')
+            else:
+                print('{}: '.format(p), end = '')
+        pp(t, 0)
+    else:
+        if name:
+            print('{}: '.format(name), end = '')
+        pp(s, 0)
+#
+# end of pp.py
+# Id: pp.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Bijective dictionary}
+
+\PyFile{bidict.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+class BiDictError(Exception): pass
+class UniqueInvError(BiDictError): pass
+class InterInvError(BiDictError): pass
+
+class bidict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.inv = {}
+        for k, v in self.items():
+            self.inv.setdefault(v, []).append(k)
+
+    def __setitem__(self, k, v):
+        if k in self:
+            x = self[k]
+            self.inv[x].remove(k)
+            if not self.inv[x]:
+                del self.inv[x]
+        super().__setitem__(k, v)
+        self.inv.setdefault(v, []).append(k)
+
+    def __delitem__(self, k):
+        v = self[k]
+        self.inv.setdefault(v, []).remove(k)
+        if not self.inv[v]:
+            del self.inv[v]
+        super().__delitem__(k)
+
+    def unique_inv(self, v):
+        ks = self.inv[v]
+        if len(ks) != 1:
+            raise UniqueInvError()
+        return ks[0]
+
+
+def dict_union(ds):
+    return {k: v for d in ds for k, v in d.items()}
+
+def bidict_union(bds):
+    return bidict(dict_union(bds))
+#
+# end of bidict.py
+# Id: bidict.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Graphs and graph algorithms}
+
+\PyFile{graph.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from collections import namedtuple
+from queue import Queue
+
+from bidict import bidict
+from pp import PrfxPP
+
+from subtype import NULL_TYPE, ValueSet, exists_ty_le_all, ty_inf, ty_sup
+
+from pattern import LabeledPattern, PatternRef, ClassPattern
+
+LayoutGraph = namedtuple('LayoutGraph', ['nodes', 'edges', 'root'])
+PatternGraph = namedtuple('PatternGraph', ['layout', 'types'])
+StateGraph = namedtuple('StateGraph', ['layout', 'types', 'values'])
+Node = namedtuple('Node', ['id'])
+Label = namedtuple('Label', ['id'])
+Edges = namedtuple('Edges', ['labels', 'targets'])
+
+class GraphError(Exception): pass
+class Mismatch(GraphError):  pass
+class NoUnion(GraphError):  pass
+class NoConj(GraphError):  pass
+class UndefRef(GraphError):  pass
+class RedefRef(GraphError):  pass
+class NoScope(GraphError):  pass
+class UndefVar(GraphError):  pass
+class UndefAttr(GraphError):  pass
+
+def unzip2(s):
+    if not s:
+        return ([], [])
+    else:
+        return list(zip(*s))
+
+def unzip4(s):
+    if not s:
+        return ([], [], [], [])
+    else:
+        return list(zip(*s))
+
+def set_union(ss):
+    return set().union(*ss)
+
+def set_inter(ss):
+    i = iter(ss)
+    for s in i:
+        return set(s).intersection(*i)
+
+    return set()
+
+def layout_graph_to_pp(g):
+    ns, es, p = g
+    pp = {}
+    pp['root'] = '({})'.format(p.id)
+    pp['nodes'] = sorted(u.id for u in ns)
+    pp['edges'] = {u.id: [(la.id, es.targets[(u, la)].id) for la in es.labels[u]]
+                   for u in sorted(ns)}
+    return PrfxPP('LayoutGraph', pp)
+
+class NodeFactory:
+    def __init__(self):
+        self._cur_id = 0
+
+    def new_node(self):
+        self._cur_id += 1
+        return Node(self._cur_id)
+
+NODE_FACTORY = NodeFactory()
+
+def new_node():
+    return NODE_FACTORY.new_node()
+
+def init_state_graph():
+    p = new_node()
+    return StateGraph(LayoutGraph({p}, Edges({p: set()}, {}), p), {}, {})
+
+def gc_layout(g):
+    ns, es, r = g
+    queue = Queue()
+    queue.put(r)
+    ns2 = set()
+    es2 = Edges(dict(), dict())
+
+    while not queue.empty():
+        p = queue.get()
+        if p not in ns2:
+            ns2.add(p)
+            las = set(es.labels[p])
+            es2.labels[p] = las
+            for la in las:
+                q = es.targets[(p, la)]
+                es2.targets[(p, la)] = q
+                queue.put(q)
+
+    return LayoutGraph(ns2, es2, r)
+
+def gc_state(sg):
+    g, tm, vm = sg
+    g2 = gc_layout(g)
+    tm2 = {p: t for (p, t) in tm.items() if p in g2.nodes}
+    vm2 = {p: v for (p, v) in vm.items() if p in g2.nodes}
+    return StateGraph(g2, tm2, vm2)
+
+def extract_pattern(sg, p):
+    (ns, es, r), tm, vm = sg
+    g2 = gc_layout(LayoutGraph(ns, es, p))
+    tm2 = {u: ValueSet({vm[u]}) if u in vm else tm[u] for u in g2.nodes}
+    return PatternGraph(g2, tm2)
+
+def swing_layout(g, p, la, q):
+    ns, es, r = g
+    es.labels[p].add(la)
+    es.targets[(p, la)] = q
+
+def swing_state(sg, p, la, q):
+    swing_layout(sg.layout, p, la, q)
+
+def add_object_to_layout(g, cla):
+    ns, es, r = g
+    p = new_node()
+    ns.add(p)
+    las = set(cla.attrs)
+    es.labels[p] = las
+    qs = []
+    for la in las:
+        q = new_node()
+        ns.add(q)
+        es.labels[q] = set()
+        es.targets[(p, la)] = q
+        qs.append(q)
+
+    return (p, qs)
+
+def add_object_to_state(sg, cla):
+    g, tm, vm = sg
+    p, qs  = add_object_to_layout(g, cla)
+    tm[p] = cla
+    for q in qs:
+        tm[q] = NULL_TYPE
+
+    return p
+
+def add_value_to_state(sg, v):
+    p  = add_object_to_state(sg, v.cla)
+    sg.values[p] = v
+    return p
+
+def push_state(sg, sla):
+    (ns, es, r), tm, vm = sg
+    r2 = new_node()
+    ns.add(r2)
+    es.labels[r2] = {sla}
+    es.targets[(r2, sla)] = r
+    return StateGraph(LayoutGraph(ns, es, r2), tm, vm)
+
+def pop_state(sg, sla):
+    (ns, es, r), tm, vm = sg
+    if sla not in es.labels[r]:
+        raise NoScope()
+
+    return gc_state(StateGraph(LayoutGraph(ns, es, es.targets[(r, sla)]), tm, vm))
+
+def find_lvar(sg, sla, la):
+    (ns, es, r), tm, vm = sg
+    while la not in es.labels[r] and sla in es.labels[r]:
+        r = es.targets[(r, sla)]
+
+    if la not in es.labels[r]:
+        raise UndefVar()
+
+    return (r, la)
+
+def find_var(sg, sla, la):
+    return sg.layout.edges.targets[find_lvar(sg, sla, la)]
+
+def find_lattr(sg, p, la):
+    (ns, es, r), tm, vm = sg
+    if not p in ns:
+        raise UndefVar()
+
+    if la not in es.labels[p]:
+        raise UndefAttr()
+
+    return (p, la)
+
+def find_attr(sg, p, la):
+    return sg.layout.edges.targets[find_lattr(sg, p, la)]
+
+def cons_match(g1, g2, le, tau1, tau2):
+    ns1, es1, p1 = g1
+    ns2, es2, p2 = g2
+    f = bidict()
+
+    def dfs_match(es1, p1, es2, p2):
+        if p1 in f:
+            if f[p1] != p2:
+                raise Mismatch()
+        else:
+            if not le(tau2[p2], tau1[p1]):
+                raise Mismatch()
+            if p2 in f.inv:
+                raise Mismatch()
+
+            f[p1] = p2
+
+            for la in es1.labels[p1]:
+                q1 = es1.targets[(p1, la)]
+                if la not in es2.labels[p2]:
+                    raise Mismatch()
+                q2 = es2.targets[(p2, la)]
+                dfs_match(es1, q1, es2, q2)
+
+    dfs_match(es1, p1, es2, p2)
+    return f
+
+def cons_union(gs):
+    ess, ps = list(zip(*((es, p) for ns, es, p in gs)))
+    fs = [bidict() for g in gs]
+
+    def dfs_union(iz, ps):
+        kz = [k for k in iz if ps[k] in fs[k]]
+        cz = [c for c in iz if ps[c] not in fs[c]]
+        uz = [fs[k][ps[k]] for k in kz]
+        if len(uz) > 1:
+            raise NoUnion()
+        if cz:
+            if uz:
+                pd = uz[0]
+                if any(pd in fs[c].inv for c in cz):
+                    raise NoUnion()
+            else:
+                pd = new_node()
+            for c in cz:
+                fs[c][ps[c]] = pd
+            laz = set_union(ess[i].labels[ps[i]] for i in iz)
+            for la in laz:
+                qs = [None]*len(gs)
+                jz = [j for j in iz if la in ess[j].labels[ps[j]]]
+                for j in jz:
+                    qs[j] = ess[j].targets[(ps[j], la)]
+                dfs_union(jz, qs)
+
+    dfs_union(list(range(len(gs))), ps)
+    return fs
+
+def cons_inter(gs):
+    ess, ps = unzip2((es, p) for ns, es, p in gs)
+    fs = [bidict() for g in gs]
+
+    def dfs_inter(ps):
+        uz = [f[p] for f, p in zip(fs, ps) if p in f]
+        if uz:
+            pc = uz[0]
+        else:
+            pc = new_node()
+        for f, p in zip(fs, ps):
+            f[p] = pc
+        if len(uz) != len(ps):
+            laz = set_inter(es.labels[p] for es, p in zip(ess, ps))
+            for la in laz:
+                qs = [es.targets[(p, la)] for es, p in zip(ess, ps)]
+                dfs_inter(qs)
+
+    dfs_inter(ps)
+    return fs
+
+def cons_match_conj(pgs):
+    gs, tms = unzip2(pgs)
+    fs = cons_union(gs)
+    tsd = {}
+    nsd = set_union(f.inv for f in fs)
+    for ud in nsd:
+        ts = {tm[f.unique_inv(ud)] for tm, f in zip(tms, fs) if ud in f.inv}
+        if not exists_ty_le_all(ts):
+            raise NoConj()
+        td = ty_inf(ts)
+        tsd[ud] = td
+
+    return (fs, tsd)
+
+def cons_match_disj(pgs):
+    gs, tms = unzip2(pgs)
+    fs = cons_inter(gs)
+    tsc = {}
+    nsc = set_union(f.inv for f in fs)
+    for uc in nsc:
+        ts = set_union({tm[u] for u in f.inv[uc]} for tm, f in zip(tms, fs))
+        tc = ty_sup(ts)
+        tsc[uc] = tc
+
+    return (fs, tsc)
+
+def cons_pattern_graph(pattern):
+    ns = set()
+    es = Edges({}, {})
+    tm = {}
+    rm = bidict()
+
+    def parse(pattern):
+        if type(pattern) is LabeledPattern:
+            la = pattern.label
+            p = parse(pattern.base)
+            if la in rm:
+                r = rm[la]
+                if r in ns:
+                    raise RedefRef()
+                'E[p/r]'
+                nlas = [nla for nla, u in es.targets.items() if u == r]
+                for nla in nlas:
+                    es.targets[nla] = p
+                'R[p/r]'
+                las2 = [la2 for la2, u in rm.items() if u == r]
+                for la2 in las2:
+                    rm[la2] = p
+
+            rm[la] = p
+        elif type(pattern) is ClassPattern:
+            cla, attrs = pattern
+            p = new_node()
+            ns.add(p)
+            tm[p] = cla
+            las, qs = unzip2([(la, parse(pattern2))
+                              for la, pattern2 in attrs.items()])
+            es.labels[p] = set(las)
+            for la, q in zip(las, qs):
+                es.targets[(p, la)] = q
+        elif type(pattern) is PatternRef:
+            la = pattern.label
+            if la in rm:
+                p = rm[la]
+            else:
+                p = new_node()
+                rm[la] = p
+        elif type(pattern) is ValueSet:
+            p = new_node()
+            ns.add(p)
+            es.labels[p] = set()
+            tm[p] = pattern
+
+        return p
+
+    p = parse(pattern)
+    if any(u not in ns for u in rm.inv):
+        raise UndefRef()
+
+    return (LayoutGraph(ns, es, p), tm, rm)
+#
+# end of graph.py
+# Id: graph.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Operations on values}
+
+\PyFile{op.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from collections import namedtuple
+
+import operator
+
+from subtype import Value, INT_TYPE, STR_TYPE, BOOL_TYPE
+
+from graph import Label, add_value_to_state
+
+OpDef = namedtuple('OpDef', ['op', 'par_types', 'res_type', 'f'])
+
+OP_TAB = {}
+
+def is_op(la):
+    return la in OP_TAB
+
+def get_op(la):
+    return OP_TAB[la]
+
+def invoke_op(sg, op, args):
+    f = OP_TAB[op].f
+    return f(sg, *args)
+
+def op_binary(sg, x, y, t, f):
+    g, tm, vm = sg
+    return add_value_to_state(sg, Value(t, f(vm[x].value, vm[y].value)))
+
+def op_unary(sg, x, t, f):
+    g, ts, vs = sg
+    return add_value_to_state(sg, t, Value(t, f(vs[x].value)))
+
+def op_add(sg, x, y):
+    return op_binary(sg, x, y, INT_TYPE, operator.add)
+
+def op_sub(sg, x, y):
+    return op_binary(sg, x, y, INT_TYPE, operator.sub)
+
+def op_mul(sg, x, y):
+    return op_binary(sg, x, y, INT_TYPE, operator.mul)
+
+def op_div(sg, x, y):
+    return op_binary(sg, x, y, INT_TYPE, operator.floordiv)
+
+def op_mod(sg, x, y):
+    return op_binary(sg, x, y, INT_TYPE, operator.mod)
+
+def op_neg(sg, x):
+    return op_unary(sg, x, INT_TYPE, operator.neg)
+
+def op_not(sg, x):
+    return op_unary(sg, x, BOOL_TYPE, operator.not_)
+
+def op_cat(sg, x, y):
+    return op_binary(sg, x, y, STR_TYPE, operator.concat)
+
+def op_lower(sg, x):
+    return op_unary(sg, x, STR_TYPE, lambda x: x.lower())
+
+def op_upper(sg, x):
+    return op_unary(sg, x, STR_TYPE, lambda x: x.lower())
+
+def op_ieq(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.eq)
+
+def op_ine(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.ne)
+
+def op_ilt(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.lt)
+
+def op_ile(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.le)
+
+def op_igt(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.gt)
+
+def op_ige(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.ge)
+
+def op_seq(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.eq)
+
+def op_sne(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.ne)
+
+def op_slt(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.lt)
+
+def op_sle(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.le)
+
+def op_sgt(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.gt)
+
+def op_sge(sg, x, y):
+    return op_binary(sg, x, y, BOOL_TYPE, operator.ge)
+
+OP_TAB = {
+    Label('add'): OpDef(Label('add'), [INT_TYPE, INT_TYPE], INT_TYPE, op_add),
+    Label('sub'): OpDef(Label('sub'), [INT_TYPE, INT_TYPE], INT_TYPE, op_sub),
+    Label('mul'): OpDef(Label('mul'), [INT_TYPE, INT_TYPE], INT_TYPE, op_mul),
+    Label('div'): OpDef(Label('div'), [INT_TYPE, INT_TYPE], INT_TYPE, op_div),
+    Label('mod'): OpDef(Label('mod'), [INT_TYPE, INT_TYPE], INT_TYPE, op_mod),
+    Label('neg'): OpDef(Label('neg'), [INT_TYPE], INT_TYPE, op_neg),
+    Label('not'): OpDef(Label('not'), [BOOL_TYPE], BOOL_TYPE, op_not),
+    Label('cat'): OpDef(Label('cat'), [STR_TYPE, STR_TYPE], STR_TYPE, op_cat),
+    Label('lower'): OpDef(Label('lower'), [STR_TYPE], STR_TYPE, op_lower),
+    Label('upper'): OpDef(Label('upper'), [STR_TYPE], STR_TYPE, op_upper),
+    Label('ieq'): OpDef(Label('ieq'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_ieq),
+    Label('ine'): OpDef(Label('ine'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_ine),
+    Label('ilt'): OpDef(Label('ilt'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_ilt),
+    Label('ile'): OpDef(Label('ile'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_ile),
+    Label('igt'): OpDef(Label('igt'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_igt),
+    Label('ige'): OpDef(Label('ige'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_ige),
+    Label('seq'): OpDef(Label('seq'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_seq),
+    Label('sne'): OpDef(Label('sne'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_sne),
+    Label('slt'): OpDef(Label('slt'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_slt),
+    Label('sle'): OpDef(Label('sle'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_sle),
+    Label('sgt'): OpDef(Label('sgt'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_sgt),
+    Label('sge'): OpDef(Label('sge'), [INT_TYPE, INT_TYPE], BOOL_TYPE, op_sge)}
+#
+# end of op.py
+# Id: op.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{State transition rules}
+
+\PyFile{st.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from bidict import dict_union, bidict_union
+
+from subtype import Value, NULL_TYPE, VALUE_TYPES, subtype
+
+from graph import (
+    Mismatch,   Label,      gc_state,   push_state, pop_state,
+    add_object_to_state,    add_value_to_state,     swing_state,
+    find_var,   find_lvar,  find_attr,  find_lattr, extract_pattern,
+    cons_match)
+
+from pattern import PatternConj, PatternDisj, MatchStmt
+
+from asx import (
+    AssignStmt, IfStmt,     WhileStmt,  PrintStmt,  BlockStmt,
+    VarDecl,    VarEnd,     VarExpr,    AttrExpr,   OpExpr,
+    NewExpr,    AndExpr,    OrExpr)
+
+from op import invoke_op
+
+SCOPE_LABEL = Label('$')
+
+def eval_value(x, sg):
+    return add_value_to_state(sg, x)
+
+def eval_var(x, sg):
+    return find_var(sg, SCOPE_LABEL, x.label)
+
+def eval_lvar(x, sg):
+    return find_lvar(sg, SCOPE_LABEL, x.label)
+
+def eval_attr(x, sg):
+    p = eval_expr(x.expr, sg)
+    return find_attr(sg, p, x.label)
+
+def eval_lattr(x, sg):
+    p = eval_expr(x.expr, sg)
+    return find_lattr(sg, p, x.label)
+
+def eval_op(x, sg):
+    la, args = x
+    return invoke_op(sg, la, [eval_expr(arg, sg) for arg in args])
+
+def eval_new(x, sg):
+    return add_object_to_state(sg, x.cla)
+
+def eval_and(x, sg):
+    left, right = x
+    p = eval_expr(left, sg)
+
+    g, tm, vm = sg
+    if vm[p].value != True:
+        return p
+
+    return eval_expr(right, sg)
+
+def eval_or(x, sg):
+    left, right = x
+    p = eval_expr(left, sg)
+
+    g, tm, vm = sg
+    if vm[p].value != False:
+        return p
+
+    return eval_expr(right, sg)
+
+EXPR_TAB = {
+    Value: eval_value,
+    VarExpr: eval_var,
+    AttrExpr: eval_attr,
+    OpExpr: eval_op,
+    NewExpr: eval_new,
+    AndExpr: eval_and,
+    OrExpr: eval_or}
+
+def eval_expr(x, sg):
+    return EXPR_TAB[type(x)](x, sg)
+
+LEXPR_TAB = {
+    VarExpr: eval_lvar,
+    AttrExpr: eval_lattr}
+
+def eval_lexpr(lx, sg):
+    return LEXPR_TAB[type(lx)](lx, sg)
+
+def st_var_decl(vd, sg):
+    la, cla = vd
+    sg = push_state(sg, SCOPE_LABEL)
+    q = add_object_to_state(sg, NULL_TYPE)
+    swing_state(sg, sg.layout.root, la, q)
+    return gc_state(sg)
+
+def st_var_end(ve, sg):
+    la = ve.label
+    return pop_state(sg, SCOPE_LABEL)
+
+def st_print(pr, sg):
+    def to_str(p):
+        cla = sg.types[p]
+
+        if cla is NULL_TYPE:
+            return 'null'
+
+        if cla in VALUE_TYPES:
+            return str(sg.values[p].value)
+
+        return '{}@({})'.format(cla.tag, p.id)
+
+    rs = [to_str(eval_expr(x, sg)) for x in pr.args]
+    print(', '.join(rs))
+    return sg
+
+def st_assign(s, sg):
+    lx, x = s
+    (p, la) = eval_lexpr(lx, sg)
+    q = eval_expr(x, sg)
+    swing_state(sg, p, la, q)
+    return gc_state(sg)
+
+def st_if(s, sg):
+    x, thens, elses = s
+    p = eval_expr(x, sg)
+    if sg.values[p].value == True:
+        return st_stmt(thens, sg)
+    else:
+        return st_stmt(elses, sg)
+
+def st_while(s, sg):
+    x, ws = s
+    p = eval_expr(x, sg)
+    while sg.values[p].value == True:
+        sg = st_stmt(ws, sg)
+        p = eval_expr(x, sg)
+
+    return gc_state(sg)
+
+def st_block(blk, sg):
+    for s in blk.stmts:
+        sg = st_scope(s, sg)
+
+    return gc_state(sg)
+
+def st_scope(s, sg):
+    if type(s) is VarDecl:
+        return st_var_decl(s, sg)
+
+    if type(s) is VarEnd:
+        return st_var_end(s, sg)
+
+    return st_stmt(s, sg)
+
+def st_match(s, sg):
+    x, cas = s
+    p = eval_expr(x, sg)
+    pg = extract_pattern(sg, p)
+
+    for junc, s, extra in cas:
+        m = match_junc(pg, junc, extra.get())
+        if m is not None:
+            sg = push_state(sg, SCOPE_LABEL)
+            for la, q in m:
+                swing_state(sg, sg.layout.root, la, q)
+            sg = st_stmt(s, sg)
+            return pop_state(sg, SCOPE_LABEL)
+
+    return sg
+
+def match_junc(pg, junc, extra):
+    if type(junc) is PatternConj:
+        pgs1, fs1, rms1 = extra
+        return match_conj(pg, pgs1, rms1)
+
+    if type(junc) is PatternDisj:
+        pgs1, fs1, rms1 = extra
+        return match_disj(pg, pgs1, fs1, rms1)
+
+    pg1, rm1 = extra
+    return match_one(pg, pg1, rm1)
+
+def match_patterns(pg1, pg2):
+    g1, ts1 = pg1
+    g2, ts2 = pg2
+
+    try:
+        f = cons_match(g2, g1, subtype, ts2, ts1)
+        return f
+    except Mismatch:
+        return None
+
+def match_one(pg, pg1, rm1):
+    f = match_patterns(pg, pg1)
+
+    if f is None:
+        return None
+
+    return [(la, f[q]) for la, q in rm1.items()]
+
+def match_disj(pg, pgs1, fs1, rms1):
+    for pg1 in pgs1:
+        f = match_patterns(pg, pg1)
+        if f is not None:
+            rm1 = dict_union(rms1)
+            f1 = bidict_union(fs1)
+            return [(la, f[(set(f1.inv[f1[u]]) & set(f)).pop()]) for la, u in rm1.items()]
+
+    return None
+
+def match_conj(pg, pgs1, rms1):
+    fs = [match_patterns(pg, pg1) for pg1 in pgs1]
+    if any(f is None for f in fs):
+        return None
+
+    rm1 = dict_union(rms1)
+    f = bidict_union(fs)
+    return [(la, f[u]) for la, u in rm1.items()]
+
+STMT_TAB = {
+    MatchStmt: st_match,
+    AssignStmt: st_assign,
+    IfStmt: st_if,
+    WhileStmt: st_while,
+    PrintStmt: st_print,
+    BlockStmt: st_block}
+
+def st_stmt(s, sg):
+    return STMT_TAB[type(s)](s, sg)
+
+def st_program(prog, sg):
+    return st_block(prog.block, sg)
+#
+# end of st.py
+# Id: st.py 4841 2021-11-14 17:09:10Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Types and subtyping rules}
+
+\PyFile{subtype.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from collections import namedtuple
+
+from pp import PrfxPP
+
+class SubtypeError(Exception): pass
+class DuplicateClassError(SubtypeError): pass
+class UndefinedClassError(SubtypeError): pass
+class AttrTypeConflictError(SubtypeError): pass
+class MinTypeError(SubtypeError): pass
+
+Tag = namedtuple('Tag', ['id'])
+Lazy = namedtuple('Lazy', ['tag'])
+
+def is_anon_tag(tag):
+    return not tag or tag.id[0] == '*'
+
+CLA_TAB = {}
+
+class Cla:
+    def __init__(self, tag, supers = [], attrs = [], tags = []):
+        if tag:
+            if tag in CLA_TAB:
+                raise DuplicateClassError()
+            CLA_TAB[tag] = self
+
+        self.tag = tag
+        self.tags = set(tags)
+        if not is_anon_tag(tag):
+            self.tags.add(tag)
+
+        self.attrs = dict(attrs)
+
+        for su in supers:
+            self.tags.update(su.tags)
+            for la, ty in su.attrs.items():
+                if la in self.attrs:
+                    if self.attrs[la] != ty:
+                        raise AttrTypeConflictError()
+                else:
+                    self.attrs[la] = ty
+
+        self.hashcode_cache = self.compute_hash()
+
+    def compute_hash(self):
+        s = list(self.tags)
+        s.sort()
+        return hash(('Cla', tuple(s)))
+
+    def resolve_lazy(self):
+        lzs = [(la, ty) for la, ty in self.attrs.items() if type(ty) is Lazy]
+        for la, ty in lzs:
+            self.attrs[la] = CLA_TAB[ty.tag]
+        return self
+
+    def __eq__(self, y):
+        if self is y:
+            return True
+
+        if not is_anon_tag(self.tag) and self.tag == y.tag:
+            return True
+
+        return self.tags == y.tags
+
+    def __hash__(self):
+        return self.hashcode_cache
+
+    def __le__(self, y):
+        if self is y:
+            return True
+
+        if not is_anon_tag(self.tag) and self.tag == y.tag:
+            return True
+
+        return self.tags >= y.tags
+
+    def to_pp(self):
+        pp = {}
+        pp['class tag'] = None if self.tag is None else self.tag.id
+        pp['supers'] = sorted(tag.id for tag in self.tags)
+        pp['attrs'] = {la.id: cla.tag.id for la, cla in self.attrs.items()}
+        return PrfxPP('Cla', pp)
+
+    @staticmethod
+    def get(tag):
+        if tag not in CLA_TAB:
+            raise UndefinedClassError()
+        return CLA_TAB[tag]
+
+    @staticmethod
+    def reset():
+        CLA_TAB = {}
+
+    @staticmethod
+    def inter(cs):
+        return Cla(None, cs)
+
+    @staticmethod
+    def union(cs):
+        tags = set.intersection(*(cla.tags for cla in cs))
+        attrs = set.intersection(*(set(cla.attrs.items()) for cla in cs))
+        return Cla(None, [], attrs, tags)
+
+NO_TYPE = Cla(Tag('*TOP'))
+NULL_TYPE = Cla(Tag('NULL'), set(), {})
+INT_TYPE = Cla(Tag('INT'), set(), {})
+STR_TYPE = Cla(Tag('STR'), set(), {})
+BOOL_TYPE = Cla(Tag('BOOL'), set(), {})
+
+VALUE_TYPES = {INT_TYPE, STR_TYPE, BOOL_TYPE}
+
+Value = namedtuple('Value', ['cla', 'value'])
+
+class ValueSet:
+    def __init__(self, vs):
+        self.values = set(vs)
+        s = list(self.values)
+        s.sort()
+        self.vector = tuple(s)
+
+    def __hash__(self):
+        return hash(('ValueSet', self.vector))
+
+    def __eq__(self, y):
+        return self.vector == y.vector
+
+def subtype(x, y):
+    if x is NULL_TYPE:
+        return True
+
+    if type(x) is Cla and type(y) is Cla:
+        return x <= y
+
+    if type(x) is ValueSet and type(y) is ValueSet:
+        return x.values <= y.values
+
+    if type(x) is ValueSet and type(y) is Cla:
+        return all(v.cla == y for v in x.values)
+
+    return False
+
+def min_type(x, y):
+    if subtype(x, y):
+        return x
+
+    if subtype(y, x):
+        return y
+
+    raise MinTypeError()
+
+def classof(x, path = []):
+    if type(x) is ValueSet:
+        if path:
+            return None
+        clas = set(v.cla for v in x.values)
+        if len(clas) != 1:
+            return None
+        return clas.pop()
+
+    if type(x) is Cla:
+        cla = x
+        for na in path:
+            if na not in cla.attrs:
+                return None
+            cla = cla.attrs[na]
+        return cla
+
+    return None
+
+def exists_ty_le_all(ts):
+    clas = [classof(t) for t in ts]
+    if any(cla is None for cla in clas):
+        return False
+
+    if any(cla in VALUE_TYPES for cla in clas):
+        return len(set(clas)) == 1
+
+    return True
+
+def ty_inf(ts):
+    clas = [classof(t) for t in ts]
+    if any(cla in VALUE_TYPES for cla in clas):
+        vss = [t for t in ts if type(t) is ValueSet]
+        if vss:
+            return ValueSet(set().union(*[vs.values for vs in vss]))
+        else:
+            return clas[0]
+    else:
+        return Cla.inter(clas)
+
+def ty_sup(ts):
+    clas = [classof(t) for t in ts]
+    if any(cla in VALUE_TYPES for cla in clas):
+        vss = [t for t in ts if type(t) is ValueSet]
+        if vss:
+            return ValueSet(set().intersection(*[vs.values for vs in vss]))
+        else:
+            return clas[0]
+    else:
+        return Cla.union(clas)
+#
+# end of subtype.py
+# Id: subtype.py 4838 2021-11-14 12:02:46Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Type-checking rules}
+
+\PyFile{tc.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from subtype import Cla, Value, subtype, min_type, classof, BOOL_TYPE, VALUE_TYPES
+
+from op import is_op, get_op
+
+from asx import (
+    PrintStmt,  AssignStmt, IfStmt,     WhileStmt,  VarDecl,
+    VarEnd,     VarExpr,    AttrExpr,   OpExpr,     NewExpr,
+    AndExpr,    OrExpr,     Program)
+
+from pattern import PatternConj, PatternDisj, MatchStmt
+
+from graph import (
+    PatternGraph, cons_pattern_graph, cons_match_conj,
+    cons_match_disj, unzip4)
+
+class Env:
+    def __init__(self, outer = None, items = []):
+        self.tab = dict(items)
+        self.outer = outer
+
+    def __contains__(self, k):
+        return k in self.tab or (self.outer is not None and k in self.outer)
+
+    def __getitem__(self, k):
+        if k in self.tab:
+            return self.tab[k]
+        else:
+            return self.outer[k]
+
+    def __setitem__(self, k, v):
+        self.tab[k] = v
+
+    def top(self):
+        return set(self.tab)
+
+    def pop(self):
+        return self.outer
+
+    def show(self):
+        print(self.tab)
+        env = self.outer
+        while env is not None:
+            print(env.tab)
+            env = env.outer
+
+class TypeCheckingError(Exception): pass
+class NodeTypeError(TypeCheckingError): pass
+class NodeSubtypeError(TypeCheckingError): pass
+class IncompatibleTypesError(TypeCheckingError): pass
+class UndefVarError(TypeCheckingError): pass
+class ParentObjectError(TypeCheckingError): pass
+class AttrError(TypeCheckingError): pass
+class OpError(TypeCheckingError): pass
+class OpArgLenError(TypeCheckingError): pass
+class OpArgTypeError(TypeCheckingError): pass
+class VarEndError(TypeCheckingError): pass
+class LeftExprError(TypeCheckingError): pass
+class ClassError(TypeCheckingError): pass
+class AssignTypeError(TypeCheckingError): pass
+class CondTypeError(TypeCheckingError): pass
+class ScopeError(TypeCheckingError): pass
+class PrintArgTypeError(TypeCheckingError): pass
+class BoolTypeError(TypeCheckingError): pass
+
+def tc_node(p, env, es, types):
+    if p in env:
+        return env[p]
+
+    if p not in types:
+        raise NodeTypeError()
+
+    t = types[p]
+    env2 = Env(env, {p: t})
+
+    for la in es.labels[p]:
+        q = es.targets[(p, la)]
+        s = tc_node(q, env2, es, types)
+        if not subtype(s, classof(t, [la])):
+            raise NodeSubtypeError()
+
+    return t
+
+def tc_graph(pg, env):
+    (ns, es, p), types = pg
+    t = tc_node(p, env, es, types)
+    return t
+
+def tc_ref(la, env, pg, refs):
+    p = refs[la]
+    (ns, es, p2), types = pg
+    t = tc_node(p, env, es, types)
+    return t
+
+def tc_pattern(pattern, env):
+    g, tm, rm = cons_pattern_graph(pattern)
+    pg = PatternGraph(g, tm)
+    t = tc_graph(pg, env)
+    rtm = {la: tc_ref(la, env, pg, rm) for la in rm}
+    return (t, rtm, pg, rm)
+
+def tc_conj(patterns, env):
+    ts, rtms, pgs, rms = unzip4([tc_pattern(pattern, env) for pattern in patterns])
+    fs, tsd = cons_match_conj(pgs)
+    rtm2 = {la: min_type(s, tsd[f[rm[la]]])
+            for f, rtm, rm in zip(fs, rtms, rms) for la, s in rtm.items()}
+    th = tsd[fs[0][pgs[0].layout.root]]
+    pts = [min_type(t, th) for t in ts]
+    return (th, pts, rtm2, pgs, fs, rms)
+
+def tc_disj(patterns, env):
+    ts, rtms, pgs, rms = unzip4([tc_pattern(pattern, env) for pattern in patterns])
+    fs, tsc = cons_match_disj(pgs)
+    rtm2 = {la: tsc[f[rm[la]]] for f, rtm, rm in zip(fs, rtms, rms) for la in rtm}
+    th = tsc[fs[0][pgs[0].layout.root]]
+    pts = [t for t in ts]
+    return (th, pts, rtm2, pgs, fs, rms)
+
+def tc_case(ca, env):
+    junc, stmt, extra = ca
+
+    if type(junc) is PatternConj:
+        t, pts, rtm, pgs, fs, rms = tc_conj(junc.patterns, env)
+        extra.put((pgs, fs, rms))
+    elif type(junc) is PatternDisj:
+        t, pts, rtm, pgs, fs, rms = tc_disj(junc.patterns, env)
+        extra.put((pgs, fs, rms))
+    else:
+        t, rtm, pg, rm = tc_pattern(junc, env)
+        extra.put((pg, rm))
+
+    env2 = Env(env, rtm)
+
+    tc_stmt(stmt, env2)
+    return t
+
+def tc_value(v, env):
+    return v.cla
+
+def tc_var(x, env):
+    la = x.label
+
+    if la not in env:
+        print(la)
+        env.show()
+        raise UndefVarError()
+
+    return env[la]
+
+def tc_attr(x, env):
+    y, la = x
+    t = tc_expr(y, env)
+
+    if type(t) is not Cla:
+        raise ParentObjectError()
+
+    if la not in t.attrs:
+        print(la)
+        raise AttrError()
+
+    return t.attrs[la]
+
+def tc_op(x, env):
+    op, args = x
+    if not is_op(op):
+        raise OpError()
+
+    d = get_op(op)
+    if len(args) != len(d.par_types):
+        raise OpArgLenError()
+
+    for y, pty in zip(args, d.par_types):
+        if tc_expr(y, env) != pty:
+            raise OpArgTypeError()
+
+    return d.res_type
+
+def tc_new(x, env):
+    if type(x.cla) is not Cla:
+        raise ClassError()
+
+    return x.cla
+
+def tc_and_or(x, env):
+    left, right = x
+
+    if tc_expr(left, env) is not BOOL_TYPE or tc_expr(right, env) is not BOOL_TYPE:
+        raise BoolTypeError()
+
+    return BOOL_TYPE
+
+EXPR_TAB = {
+    Value: tc_value,
+    VarExpr: tc_var,
+    AttrExpr: tc_attr,
+    OpExpr: tc_op,
+    NewExpr: tc_new,
+    AndExpr: tc_and_or,
+    OrExpr: tc_and_or}
+
+def tc_expr(x, env):
+    return EXPR_TAB[type(x)](x, env)
+
+def tc_match(m, env):
+    expr, cas = m
+    t2 = tc_expr(expr, env)
+
+    for ca in cas:
+        t = tc_case(ca, env)
+        if not (subtype(t2, t) or subtype(t, t2)):
+            raise IncompatibleTypesError()
+
+    return env
+
+def tc_var_decl(vd, env):
+    la, cla = vd
+    return Env(env, {la: cla})
+
+def tc_var_end(ve, env, env_base):
+    if env is env_base:
+        raise VarEndError()
+
+    if set([ve.label]) != env.top():
+        raise VarEndError()
+
+    return env.pop()
+
+def tc_print(pr, env):
+    for x in pr.args:
+        tc_expr(x, env)
+
+    return env
+
+def tc_assign(assign, env):
+    lx, x = assign
+
+    if type(lx) not in {VarExpr, AttrExpr}:
+        raise LeftExprError()
+
+    t = tc_expr(lx, env)
+    t2 = tc_expr(x, env)
+
+    if not subtype(t2, t):
+        raise AssignTypeError()
+
+    return env
+
+def tc_if(ifs, env):
+    x, thens, elses = ifs
+
+    if tc_expr(x, env) is not BOOL_TYPE:
+        raise CondTypeError()
+
+    tc_stmt(thens, env)
+    tc_stmt(elses, env)
+    return env
+
+def tc_while(ws, env):
+    x, s = ws
+
+    if tc_expr(x, env) is not BOOL_TYPE:
+        raise CondTypeError()
+
+    tc_stmt(s, env)
+    return env
+
+def tc_stmt(s, env):
+    if type(s) is MatchStmt:
+        return tc_match(s, env)
+
+    if type(s) is AssignStmt:
+        return tc_assign(s, env)
+
+    if type(s) is IfStmt:
+        return tc_if(s, env)
+
+    if type(s) is WhileStmt:
+        return tc_while(s, env)
+
+    if type(s) is PrintStmt:
+        return tc_print(s, env)
+
+    return tc_block(s, env)
+
+def tc_block(blk, env):
+    env2 = env
+    for s in blk.stmts:
+        env2 = tc_scope(s, env2, env)
+
+    if env2 is not env:
+        raise ScopeError()
+
+    return env
+
+def tc_scope(s, env, env_base):
+    if type(s) is VarDecl:
+        return tc_var_decl(s, env)
+
+    if type(s) is VarEnd:
+        return tc_var_end(s, env, env_base)
+
+    return tc_stmt(s, env)
+
+def tc_program(prog, env):
+    return tc_block(prog.block, env)
+#
+# end of tc.py
+# Id: tc.py 4841 2021-11-14 17:09:10Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\section{Test cases}
+
+\PyFile{test\_cases.py}
+\begin{dispPy}
+#    (c) 2021 \BlindText{Wei Ke and Ka-Hou Chan}
+#    license:          GPL-3
+#
+from pp import pprint
+
+from subtype import (
+    Tag,        Lazy,       Cla,        subtype,    INT_TYPE,
+    STR_TYPE,   BOOL_TYPE,  NO_TYPE,    Value,      ValueSet)
+
+from pattern import (
+    LabeledPattern, ClassPattern,   PatternRef, PatternConj,
+    PatternDisj,    MatchStmt,      Case,       Extra)
+
+from graph import (
+    Label,  cons_pattern_graph, layout_graph_to_pp,
+    init_state_graph)
+
+from asx import (
+    VarDecl,    VarEnd,     PrintStmt,  AssignStmt, BlockStmt,
+    IfStmt,     WhileStmt,  VarExpr,    AttrExpr,   NewExpr,
+    OpExpr,     AndExpr,    OrExpr,     Program)
+
+from tc import tc_stmt, tc_program, Env
+
+from st import st_stmt, st_program
+
+def test_subtype():
+    print(
+'''
+----
+---- subtype ----
+----
+''')
+
+    Cla.reset()
+
+    a1 = Label('a1')
+    a2 = Label('a2')
+    b1 = Label('b1')
+    b2 = Label('b2')
+    c1 = Label('c1')
+    c2 = Label('c2')
+    d1 = Label('d1')
+    d2 = Label('d2')
+
+    A = Cla(Tag('A'),
+        [],
+        {
+            a1: INT_TYPE,
+            a2: STR_TYPE
+        })
+
+    B = Cla(Tag('B'),
+        [A],
+        {
+            b1: INT_TYPE,
+            b2: STR_TYPE
+        })
+
+    C = Cla(Tag('C'),
+        [A],
+        {
+            c1: INT_TYPE,
+            c2: STR_TYPE
+        })
+
+    D = Cla(Tag('D'),
+        [B, C],
+        {
+            d1: INT_TYPE,
+            d2: STR_TYPE
+        })
+
+    pprint(D.to_pp())
+
+    E = Cla.inter([B, C])
+    pprint(E.to_pp())
+
+    print(subtype(D, E))
+    print(subtype(E, D))
+
+    pprint(NO_TYPE.to_pp())
+    print(subtype(A, NO_TYPE))
+
+    ONE = Value(INT_TYPE, 1)
+    TWO = Value(INT_TYPE, 2)
+    THREE = Value(INT_TYPE, 3)
+    TEN = Value(INT_TYPE, 10)
+    HELLO = Value(STR_TYPE, 'Hello')
+
+    VSET1 = ValueSet(set(Value(INT_TYPE, x) for x in range(10)))
+    print(subtype(ValueSet(set([ONE, TWO])), VSET1))
+    print(subtype(ValueSet(set([ONE, TWO, TEN])), VSET1))
+    print(subtype(VSET1, INT_TYPE))
+
+    F = Cla.union([B, C])
+    pprint(F.to_pp())
+    print(subtype(F, A))
+    print(subtype(A, F))
+    print(A == F)
+
+    h1 = Label('h1')
+    h2 = Label('h2')
+    k = Label('k')
+
+    H = Cla(Tag('H'),
+        [],
+        {
+            h1: INT_TYPE,
+            h2: A
+        })
+
+    K = Cla(Tag('K'),
+        [],
+        {
+            k: H
+        })
+
+    o = Label('o')
+    q = Label('q')
+    x = Label('x')
+    y = Label('y')
+
+    pb = ClassPattern(
+        K,
+        {
+            k : ClassPattern(
+                H,
+                {
+                    h1: ClassPattern(INT_TYPE, {}),
+                    h2: ClassPattern(B, {})
+                })
+        })
+
+    pc = ClassPattern(
+        K,
+        {
+            k : ClassPattern(
+                H,
+                {
+                    h1: ClassPattern(INT_TYPE, {}),
+                    h2: LabeledPattern(x, ClassPattern(C, {}))
+                })
+        })
+
+    s1 = BlockStmt([
+        VarDecl(o, K),
+        VarDecl(q, D),
+        AssignStmt(VarExpr(o), NewExpr(K)),
+        AssignStmt(AttrExpr(VarExpr(o), k), NewExpr(H)),
+        AssignStmt(AttrExpr(AttrExpr(VarExpr(o), k), h1), Value(INT_TYPE, 3)),
+        AssignStmt(VarExpr(q), NewExpr(D)),
+        AssignStmt(AttrExpr(VarExpr(q), a1), Value(INT_TYPE, 4)),
+        AssignStmt(AttrExpr(VarExpr(q), b1), Value(INT_TYPE, 5)),
+        AssignStmt(AttrExpr(VarExpr(q), c1), Value(INT_TYPE, 6)),
+        AssignStmt(AttrExpr(AttrExpr(VarExpr(o), k), h2), VarExpr(q)),
+
+        MatchStmt(VarExpr(o), [
+            Case(PatternConj([pb, pc]), BlockStmt([
+                VarDecl(y, E),
+                AssignStmt(VarExpr(y), VarExpr(x)),
+                PrintStmt([
+                    AttrExpr(VarExpr(y), a1),
+                    AttrExpr(VarExpr(y), b1),
+                    AttrExpr(VarExpr(y), c1)
+                    ]),
+                VarEnd(y)
+                ]), Extra())
+            ]),
+
+        MatchStmt(VarExpr(o), [
+            Case(PatternDisj([pb, pc]), BlockStmt([
+                VarDecl(y, F),
+                AssignStmt(VarExpr(y), VarExpr(x)),
+                PrintStmt([AttrExpr(VarExpr(y), a1)]),
+                VarEnd(y)
+                ]), Extra())
+            ]),
+
+        VarEnd(q),
+        VarEnd(o)])
+
+    env = tc_stmt(s1, Env())
+    sg = st_stmt(s1, init_state_graph())
+
+
+def test_fig2():
+    print(
+'''
+----
+---- figure 2 ----
+----
+''')
+
+    Cla.reset()
+
+    e = Label('e')
+    l = Label('l')
+    r = Label('r')
+
+    w = Label('w')
+    x = Label('x')
+    y = Label('y')
+    z = Label('z')
+
+    T_lz = Lazy(Tag('T'))
+
+    T = Cla(T_lz.tag,
+        [],
+        {
+            e: INT_TYPE,
+            l: T_lz,
+            r: T_lz
+        }).resolve_lazy()
+
+    pprint(T.to_pp())
+
+    pattern = ClassPattern(
+        T,
+        {
+            e: ValueSet({Value(INT_TYPE, 0)}),
+            l: LabeledPattern(w, ClassPattern(
+                T,
+                {
+                    l: LabeledPattern(x, ClassPattern(T, {})),
+                    r: LabeledPattern(y, ClassPattern(
+                        T,
+                        {
+                            l: PatternRef(w),
+                            r: PatternRef(z)
+                        }))
+                })),
+            r: LabeledPattern(z, ClassPattern(T, {}))
+        })
+
+    g, tm, rm = cons_pattern_graph(pattern)
+    pprint(layout_graph_to_pp(g))
+
+    o = Label('o')
+
+    s1 = BlockStmt([
+        VarDecl(o, T),
+        AssignStmt(VarExpr(o), NewExpr(T)),
+        AssignStmt(AttrExpr(VarExpr(o), l), NewExpr(T)),
+        AssignStmt(AttrExpr(VarExpr(o), r), NewExpr(T)),
+        AssignStmt(AttrExpr(AttrExpr(VarExpr(o), l), l), NewExpr(T)),
+        AssignStmt(AttrExpr(AttrExpr(VarExpr(o), l), r), NewExpr(T)),
+        AssignStmt(AttrExpr(AttrExpr(AttrExpr(VarExpr(o), l), r), l), AttrExpr(VarExpr(o), l)),
+        AssignStmt(AttrExpr(AttrExpr(AttrExpr(VarExpr(o), l), r), r), AttrExpr(VarExpr(o), r)),
+
+        AssignStmt(AttrExpr(VarExpr(o), e), Value(INT_TYPE, 0)),
+        AssignStmt(AttrExpr(AttrExpr(VarExpr(o), l), e), Value(INT_TYPE, 1)),
+        AssignStmt(AttrExpr(AttrExpr(AttrExpr(VarExpr(o), l), l), e), Value(INT_TYPE, 2)),
+        AssignStmt(AttrExpr(AttrExpr(AttrExpr(VarExpr(o), l), r), e), Value(INT_TYPE, 3)),
+        AssignStmt(AttrExpr(AttrExpr(VarExpr(o), r), e), Value(INT_TYPE, 4)),
+
+        MatchStmt(VarExpr(o), [
+            Case(pattern, PrintStmt([
+                AttrExpr(VarExpr(w), e),
+                AttrExpr(VarExpr(x), e),
+                AttrExpr(VarExpr(y), e),
+                AttrExpr(VarExpr(z), e)
+                ]), Extra())
+            ]),
+        VarEnd(o)])
+
+    env = tc_stmt(s1, Env())
+    sg = st_stmt(s1, init_state_graph())
+
+
+def test_fig3():
+    print(
+'''
+----
+---- figure 3 ----
+----
+''')
+
+    Cla.reset()
+
+    a = Label('a')
+    b = Label('b')
+    c = Label('c')
+    d = Label('d')
+    e = Label('e')
+    x = Label('x')
+    y = Label('y')
+
+    X = Cla(Tag('X'),
+        [],
+        {
+            b: INT_TYPE,
+            c: STR_TYPE,
+            d: STR_TYPE
+        })
+
+    pprint(X.to_pp())
+
+    Y = Cla(Tag('Y'),
+        [X],
+        {
+            a: INT_TYPE,
+        })
+
+    pprint(Y.to_pp())
+
+    Z = Cla(Tag('Z'),
+        [X],
+        {
+            e: BOOL_TYPE,
+        })
+
+    pprint(Z.to_pp())
+
+    W = Cla(Tag('W'),
+        [Y, Z],
+        {})
+
+    pprint(W.to_pp())
+
+    p1 = ClassPattern(
+        Y,
+        {
+            a: ValueSet(set(Value(INT_TYPE, x) for x in range(3))),
+            c: LabeledPattern(x, ClassPattern(STR_TYPE, {})),
+            d: ClassPattern(STR_TYPE, {})
+        })
+
+    p2 = ClassPattern(
+        Z,
+        {
+            c: ClassPattern(STR_TYPE, {}),
+            d: ClassPattern(STR_TYPE, {}),
+            e: ValueSet({Value(BOOL_TYPE, False)})
+        })
+
+    p3 = ClassPattern(
+        X,
+        {
+            b: ValueSet({Value(INT_TYPE, 1)}),
+            c: ValueSet({Value(STR_TYPE, 'apple')}),
+            d: ValueSet({Value(STR_TYPE, 'banana')})
+        })
+
+    p4 = ClassPattern(
+        Z,
+        {
+            b: ValueSet({Value(INT_TYPE, 1)}),
+            c: LabeledPattern(y, ValueSet({Value(STR_TYPE, 'apple')})),
+            d: PatternRef(y)
+        })
+
+    conj = PatternConj([p1, p2, p3])
+    disj = PatternDisj([p3, p4])
+
+    o = Label('o')
+    q = Label('q')
+    u = Label('u')
+    v = Label('v')
+
+    prog = Program(BlockStmt([
+        VarDecl(o, W),
+        VarDecl(q, STR_TYPE),
+        VarDecl(u, BOOL_TYPE),
+        VarDecl(v, INT_TYPE),
+        AssignStmt(VarExpr(o), NewExpr(W)),
+        AssignStmt(AttrExpr(VarExpr(o), a), Value(INT_TYPE, 1)),
+        AssignStmt(AttrExpr(VarExpr(o), b), AttrExpr(VarExpr(o), a)),
+        AssignStmt(AttrExpr(VarExpr(o), c), Value(STR_TYPE, 'apple')),
+        AssignStmt(AttrExpr(VarExpr(o), d), Value(STR_TYPE, 'banana')),
+        AssignStmt(AttrExpr(VarExpr(o), e), Value(BOOL_TYPE, False)),
+
+        MatchStmt(VarExpr(o), [
+            Case(p4, PrintStmt([Value(STR_TYPE, 'p4, This should not match.')]), Extra())
+            ]),
+        PrintStmt([Value(STR_TYPE, 'after p4'), VarExpr(q)]),
+        MatchStmt(VarExpr(o), [
+            Case(p4, PrintStmt([Value(STR_TYPE, 'p4, This should not match.')]), Extra()),
+            Case(disj, BlockStmt([
+                AssignStmt(VarExpr(q), VarExpr(y)),
+                PrintStmt([Value(STR_TYPE, 'disj'), VarExpr(q)])]), Extra())
+            ]),
+        MatchStmt(VarExpr(o), [
+            Case(conj, BlockStmt([
+                AssignStmt(VarExpr(q), VarExpr(x)),
+                PrintStmt([Value(STR_TYPE, 'conj'), VarExpr(q)])]), Extra()),
+            Case(p1, BlockStmt([
+                AssignStmt(VarExpr(q), VarExpr(x)),
+                PrintStmt([Value(STR_TYPE, 'p1'), VarExpr(q)])]), Extra())
+            ]),
+        MatchStmt(VarExpr(o), [
+            Case(p4, PrintStmt([Value(STR_TYPE, 'p4, This should not match.')]), Extra()),
+            Case(p1, BlockStmt([
+                AssignStmt(VarExpr(q), VarExpr(x)),
+                PrintStmt([Value(STR_TYPE, 'p1'), VarExpr(q)])]), Extra())
+            ]),
+        MatchStmt(VarExpr(o), [
+            Case(p4, PrintStmt([Value(STR_TYPE, 'p4, This should not match.')]), Extra()),
+            Case(p2, BlockStmt([
+                AssignStmt(VarExpr(v), AttrExpr(VarExpr(o), b)),
+                PrintStmt([Value(STR_TYPE, 'p2'), VarExpr(v)])]), Extra())
+            ]),
+        MatchStmt(VarExpr(o), [
+            Case(p4, PrintStmt([Value(STR_TYPE, 'p4, This should not match.')]), Extra()),
+            Case(p3, BlockStmt([
+                AssignStmt(VarExpr(u), AttrExpr(VarExpr(o), e)),
+                PrintStmt([Value(STR_TYPE, 'p3'), VarExpr(u)])]), Extra())
+            ]),
+        VarEnd(v),
+        VarEnd(u),
+        VarEnd(q),
+        VarEnd(o)]))
+
+    env = tc_program(prog, Env())
+    sg = st_program(prog, init_state_graph())
+
+
+def test_gcd():
+    print(
+'''
+----
+---- gcd ----
+----
+''')
+
+    Cla.reset()
+
+    m = Label('m')
+    n = Label('n')
+    t = Label('t')
+
+    s1 = BlockStmt([
+        VarDecl(m, INT_TYPE),
+        VarDecl(n, INT_TYPE),
+        AssignStmt(VarExpr(m), Value(INT_TYPE, 210)),
+        AssignStmt(VarExpr(n), Value(INT_TYPE, 120)),
+        PrintStmt([Value(STR_TYPE, 'numbers'), VarExpr(m), VarExpr(n)]),
+
+        IfStmt(
+            OrExpr(
+                OpExpr(Label('igt'), [VarExpr(m), Value(INT_TYPE, 200)]),
+                OpExpr(Label('igt'), [VarExpr(n), Value(INT_TYPE, 200)])),
+            PrintStmt([Value(STR_TYPE, 'one is > 200')]),
+            PrintStmt([Value(STR_TYPE, 'none is > 200')])),
+
+        IfStmt(
+            AndExpr(
+                OpExpr(Label('igt'), [VarExpr(m), Value(INT_TYPE, 200)]),
+                OpExpr(Label('igt'), [VarExpr(n), Value(INT_TYPE, 200)])),
+            PrintStmt([Value(STR_TYPE, 'both are > 200')]),
+            PrintStmt([Value(STR_TYPE, 'one is <= 200')])),
+
+        BlockStmt([
+            WhileStmt(
+                OpExpr(Label('ine'), [VarExpr(n), Value(INT_TYPE, 0)]),
+                BlockStmt([
+                    VarDecl(t, INT_TYPE),
+                    AssignStmt(VarExpr(t), VarExpr(m)),
+                    AssignStmt(VarExpr(m), VarExpr(n)),
+                    AssignStmt(VarExpr(n), OpExpr(Label('mod'), [VarExpr(t), VarExpr(n)])),
+                    VarEnd(t)])),
+            PrintStmt([Value(STR_TYPE, 'gcd'), VarExpr(m)])
+        ]),
+
+        VarEnd(n),
+        VarEnd(m)
+        ])
+
+    env = tc_stmt(s1, Env())
+    sg = st_stmt(s1, init_state_graph())
+
+
+if __name__ == '__main__':
+    test_subtype()
+    test_fig2()
+    test_fig3()
+    test_gcd()
+#
+# end of test\_cases.py
+# Id: test\_cases.py 4841 2021-11-14 17:09:10Z \BlindText{wke@IPM.EDU.MO}
+\end{dispPy}
+
+\endinput

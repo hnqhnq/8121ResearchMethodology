@@ -1,0 +1,228 @@
+%% (I) Document Class Options - PhD Thesis Template
+%%
+%% === 1. Programme Selection ===
+%% - Doctoral Degree Programmes:
+%%   - PCOM: Doctor of Philosophy in Computer Applied Technology (Applicable to 2023/2024 intake and onwards)
+%%   - PAIDD: Doctor of Philosophy in Artificial Intelligence driven Drug Discovery
+%%   - PETI: Doctor of Philosophy in Educational Technology and Innovation
+%%
+%% - Joint Programmes:
+%%   - JUC: University of Coimbra - Doctoral Programme in Information Science and Technology
+%%   - JUB: University of Bologna - Doctoral Programme in Computer Science and Engineering
+%%
+%% === 2. Font Selection ===
+%% Available fonts: Times, Utopia, Garamond, Palatino, Libertine (default)
+%%
+%% === 3. Document Type Selection ===
+%% - Proposal (default): Research Proposal
+%% - Thesis: Final Thesis
+%%
+%% === 4. Mode Selection ===
+%% - Review (default): Draft for review
+%% - Final: Final submission version
+%% - Screen (default): Equal inner and outer margins, better for screen display
+%% - Print: Larger inner margins, better for printing and binding
+%%
+%% === 5. Hardback Selection ===
+%% - NoHardback (default): Softcopy binding
+%% - Hardback: Hardcopy printing
+%%
+%% === 6. Ph. D. after Name ===
+%% - PhDAfterName (default): Put `Ph. D.' under student name on hardback cover
+%% - NoPhDAfterName: No `Ph. D.' under student name
+%%
+%% === 7. Line Spacing ===
+%% - OneHalfSpacing (default): 1.5x line spacing
+%% - DoubleSpacing: Double line spacing
+%%
+%% === 8. Algorithm Packages ===
+%% - AlgoMic: `algorithm' and `algorithmic'
+%% - AlgoX: `algorithm', `algorithmicx' and `algpseudocode'
+%% - AlgoIIe: `algorithm2e'
+%% The above three options are mutually exclusive.
+%% - MathPar: `mathpartir'
+%%
+
+%% Example 1: Research Proposal (Draft Version)
+%% If you're submitting a draft version of your research proposal, you might use:
+%% - Programme: Doctor of Philosophy in Artificial Intelligence driven Drug Discovery
+%% - Document Type: Proposal
+%% - Mode: Review (for feedback before final submission)
+%% \documentclass[PAIDD,Proposal,Review]{mpThesis}
+
+%% Example 2: Joint Programme (Softcover Thesis)
+%% If you're in a joint programme and need a softcopy for defence:
+%% - Programme: University of Bologna - Doctoral Programme in Computer Science and Engineering
+%% - Document Type: Thesis
+%% - Mode: Final (submission to faculty)
+%% - Hardback: NoHardback
+%% \documentclass[JUB,Thesis,Final,NoHardback]{mpThesis}
+
+%% Example 3: Final Thesis Submission (Hardcover printing)
+%% For submitting the final version of your PhD thesis with hardcover binding:
+%% - Programme: Doctor of Philosophy in Computer Applied Technology
+%% - Document Type: Thesis
+%% - Mode: Final (ready for official submission)
+%% - Binding: Hardcover
+%% \documentclass[PCOM,Thesis,Final,Hardback]{mpThesis}
+
+%% Example 4: Final Thesis Submission for Review
+%% - Programme: Doctor of Philosophy in Computer Applied Technology
+%% - Document Type: Thesis
+%% - Mode: Review
+\documentclass[PCOM,Thesis,Review,AlgoIIe,MathPar]{mpThesis}
+
+%% (II)
+%% additional LaTeX packages included:
+\usepackage{orcidlink}
+
+%% (III)
+%% commands to define variables:
+%%
+\StudentName{Brianchon Pascal} % \StudentName[Lone Name\\with Line Breaks]{Given Family}
+\StudentNumber{P-12-1234-1} % \StudentNumber{<<Student Number>>} % P-XX-XXXX-X
+\Supervisor{Desargues Monge}
+\CoSupervisor{Hilbert Minkowski}
+%% joint supervisor
+% \JointSupervisor{<<Joint Supervisor>>}
+
+%% info for thesis defence examination
+\DefenceDateTime{9999-01-02}{23:59:00} % Defence Date (YYYY-MM-DD), and Time (hh:mm:ss)
+\PanelChair{<<Chair>>}
+%% normal programmes
+\PanelExternal{<<External Examiner>>}
+\PanelInternalA{<<Internal Examiner A>>}
+\PanelInternalB{<<Internal Examiner B>>}
+%% joint programmes
+% \PanelExternal{<<External Examiner>>}
+% \PanelJointExternal{<<Joint External Examiner>>}
+% \PanelInternal{<<Internal Examiner>>}
+% \PanelJointInternal{<<Joint Internal Examiner>>}
+%%
+
+\Title%
+[A Sample Thesis --- Pattern Matching Based on Object Graphs ---\\for Using the MPU {\LaTeX} Thesis Template]% for binder
+{A Sample Thesis --- Pattern Matching Based on Object Graphs --- for Using the MPU {\LaTeX} Thesis Template}
+
+\ChsTitle%
+{论文样例 --- 基于对象图的模式匹配 --- MPU {\LaTeX} 论文模板用例}
+
+\ChtTitle%
+{論文樣例 --- 基于對象圖的模式匹配 --- MPU {\LaTeX} 論文模板用例}
+
+\ThesisNumber{0000}{\InsertProgrammeCode}{\InsertAcademicShort}{pascal}{sample} % the word `sample' here can be replaced with any word related to the content of this thesis.
+
+\ThesisKeywords{%
+  pattern matching,
+  object graph,
+  subtyping,
+  type system,
+  operational semantics,
+  programming language}
+
+\ThesisChsKeywords{%
+  模式匹配、
+  对象图、
+  子类型、
+  类型系统、
+  操作语义、
+  程序设计语言}
+
+\ThesisChtKeywords{%
+  模式匹配、
+  對象圖、
+  子類型、
+  類型系統、
+  操作語義、
+  程序設計語言}
+
+\Date{\InsertThesisClassDate} %Submission Date (YYYY-MM-DD)
+
+%% commands to insert variables:
+%%
+%% \InsertStudentName
+%% \InsertStudentNameBreak
+%% \InsertStudentNumber
+%% \InsertUniversity
+%% \InsertJointUniversity
+%% \InsertAcademicUnit
+%% \InsertAcademicShort
+%% \InsertProgrammeBreak
+%% \InsertProgrammeBreak
+%% \InsertJointProgramme
+%% \InsertJointProgrammeBreak
+%% \InsertProgrammeCode
+%% \InsertSupervisor
+%% \InsertJointSupervisor
+%% \InsertLongDate
+%% \InsertDate
+%% \InsertYear
+%% \InsertMonthYear
+%% \InsertTitle
+%% \InsertThesisNumber
+%% \InsertThesisUrl
+%% \InsertDefenceDate
+%% \InsertDefenceTime
+%% \InsertPanelChair
+%% \InsertPanelExternal
+%% \InsertPanelExternalA
+%% \InsertPanelJointExternal
+%% \InsertPanelExternalB
+%% \InsertPanelInternal
+%% \InsertPanelInternalA
+%% \InsertPanelJointInternal
+%% \InsertPanelInternalB
+%%
+
+%% (SP)
+%% content-specific LaTeX packages included:
+\usepackage{ogpmx}
+\usepackage{ogpmPylst}
+
+\EmphasizeAuthors{emphasized/author/list/3}
+\bibliographystyle{mpUnsrt.bst} %unsrt, acm, ieeetr, apalike, mpUnsrt
+
+\begin{document}
+%%
+%%
+%% - List of Figures [FigLs]: true (default), false
+%% - List of Tables [TabLs]: true (default), false
+%% - List of Algorithms [AlgoLs]: true, false (default)
+%% - List of Abbreviations [AbbreLs]: true (default), false
+\begin{FrontMatter}[FigLs,TabLs,AlgoLs,AbbreLs]
+\input{Declaration.tex}
+\input{Abstract.tex}
+\input{Acknowledgments.tex}
+\end{FrontMatter}
+%%
+%%
+\begin{MainMatter}
+\input{Chapter1.tex}
+\input{Chapter2.tex}
+\input{Chapter3.tex}
+\input{Chapter4.tex}
+\input{Chapter5.tex}
+\input{Chapter6.tex}
+\input{Chapter7.tex}
+\end{MainMatter}
+%%
+%%
+\begin{BackMatter}
+\bibliography{Emphasized.bib,ogpm.bib,Bibliography.bib} %list emphasized names and styles in a separate bib, include when needed.
+\end{BackMatter}
+%%
+%%
+\begin{Appendix}
+\input{AppendixA.tex}
+\input{AppendixB.tex}
+\input{AppendixC.tex}
+\input{AppendixD.tex}
+\end{Appendix}
+%%
+%%
+\end{document}
+
+\endinput
+
+%%
+%% $Id: sample-thesis.tex 9106 2026-04-13 08:24:25Z wke@IPM.EDU.MO $

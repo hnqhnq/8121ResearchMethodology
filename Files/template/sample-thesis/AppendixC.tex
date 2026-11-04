@@ -1,0 +1,157 @@
+\chapter{Algorithms as Inference Rules}\label{app:infer}
+
+There are a number of ways to express algorithms in an article of computer science.
+Some traditional way writes imperative pseudo code that emphasizes state changing (assignments) and loops, as shown in \autoref{algo:match-dfs-cons}.
+While pseudo code in this style can be straightforwardly translated to a common imperative programming language, such as {\CPP},
+it is less mathematically formal and rigorous, with a big burden to reason about.
+On the other hand, functional style algorithms use equations to introduce new variables and bindings, without changing the value bound to a variable.
+It is obvious that updating the state of a variable is only useful when running in a loop.
+The functional style employs recursive calls to achieve much more powerful repetitions and bind new values to variables in inner calls.
+It is a more concise and rigorous way to express algorithms, and a better form to reason about the correctness and properties.
+
+\paragraph{Inference rules}
+Functional style algorithms often use pattern matching with guards to perform case analyses on the input arguments, and
+bind new variables to components and intermediate results for further specification.
+Just like the chained conditional statements in traditional pseudo code, these cases are listed alongside the left for clarity.
+This is space wasting for publishing articles in journals and proceedings.
+An elegant space saving way of listing the possibly nested cases is to formulate them as a sequence of {\em inference rules},
+\begin{mathpar}
+\inferrule[(Case 1)]
+  {A \\ B \\ C}
+  {\inferrulel[(Inner Case)]
+    {F \\ G}
+    {K_1} \\
+   \inferrulel[(Inner Else)]
+    {\quad}
+    {K_2}
+  }
+\and
+\inferrule[(Case 2)]
+  {\quad D \\ E \quad}
+  {K_3}
+\and
+\inferrule[(Else)]
+  {\quad \\ \quad}
+  {K_4},
+\end{mathpar}
+where $A,B,C,D,E$ are the top-level premises, $F,G$ the inner-level premises of the rule labeled ({\sc Inner Case}), $K_1, K_2, K_3, K_4$ the conclusions.
+Inference rules are examined sequentially, thus, $\neg(A \wedge B \wedge C)$ is implied in ({\sc Case 2}).
+For example, the Euclid's greatest common divisor algorithm $\mathit{gcd}(m, n)$ can be defined on integers $m,n$ as follows,
+\begin{mathpar}
+\mathit{gcd}(m,n) =
+\and
+\inferrule
+  {m < 0}
+  {\mathit{gcd}(-m,n)}
+\and
+\inferrule
+  {n < 0}
+  {\mathit{gcd}(m,-n)}
+\and
+\inferrule
+  {m < n}
+  {\mathit{gcd}(n, m)}
+\and
+\inferrule
+  {n = 0}
+  {m}
+\and
+\inferrule
+  {\quad}
+  {\mathit{gcd}(n, m-n)}.
+\end{mathpar}
+
+Generally, functional style algorithms are more abstract and less to write.
+However, for accumulation over a collection of elements, some verbose arrangement is necessary to explicitly handle the iteration of elements.
+Let's see another example to translate $\DfsMatch$ in \autoref{algo:match-dfs-cons} to inference rules.
+\begin{mathpar}
+\DfsMatch'(f, \emptyset, E, E') = f,
+\\
+\DfsMatch'(f, \lstt{(p, p')}\uplus P, E, E') =
+\and
+\inferrule
+  {p \in \dom(f)}
+  {\inferrule{f(p) \ne p'}{\KwRaise\ \Mismatch} \\
+   \inferrule{\quad}{\DfsMatch'(f,P,E,E')}
+  }
+\and
+\inferrule
+  {\tau(p') \nsubty \tau(p)}
+  {\KwRaise\ \Mismatch}
+\and
+\inferrule
+  {p' \in \ran(f)}
+  {\KwRaise\ \Mismatch}
+\and
+\inferrule
+  {\exists p \la{a} q \in E \suchthat p' \la{a} q' \not\in E'}
+  {\KwRaise\ \Mismatch}
+\and
+\inferrule
+  {Q = \lstt{(q, q') \mid p \la{a} q \in E \wedge p' \la{a} q' \in E'}}
+  {\DfsMatch'(f\cup\sett{p \mapsto p'},Q \uplus P,E,E')}.
+\end{mathpar}
+The use of list concatenation $\uplus$ in the above definition implements the stack pop and push that guarantee the \DFS.
+
+\paragraph{Overlined terms}
+To reduce the occasions of explicit enumeration of elements over a collection, {\em overlined terms} are often used in certain cases.
+To the simplest case, an overlined varible $\overline{v}$ is expanded to a series of variables $v_1,\dots,v_n$.
+This expansion is usually restricted by the context, where a component may already be defined.
+A variable that is defined as a singlton repeats itself in the expansion.
+A variable that is also a series pairs with the other series element-wise in the expansion.
+For example, let $f$ be a defined function, $\overline{a}$ a series. Then $\overline{b = 2a}$ expands to $b_1 = 2a_1,\dots,b_n = 2a_n$, and
+$\overline{f(a,b)}$ expands to $f(a_1,b_1),\dots,f(a_n,b_n)$.
+With the overlined terms, $\DfsMatch'$ can be re-written without the list comprehension.
+\begin{mathpar}
+\DfsMatch'(f, \lstt{(p, p')}\uplus P, E, E') =
+\and
+\inferrulel[(visited)]
+  {f(p) = p'}
+  {\DfsMatch'(f,P,E,E')}
+\and
+\inferrulel[(explore)]
+  {\tau(p') \subty \tau(p) \\ \overline{p \la{a} q \in E \implies p' \la{a} q' \in E'} \\\\ p \notin \dom(f) \\ p' \notin \ran(f)}
+  {\DfsMatch'(f\cup\sett{p \mapsto p'},[\overline{(q,q')}] \uplus P,E,E')}
+\and
+\inferrule
+  {\quad}
+  {\KwRaise\ \Mismatch}.
+\end{mathpar}
+I would say the overline used in this definition is quite intuitive. If a detailed explanation must be given,
+$p, p', E, E'$ are bound variable in the context, $a, q, q'$ are new series.
+Since $q$ and $q'$ are all aligned with $a$, they have the correspondence synchronized by $a$.
+Therefore, we can expand the overlined term as, for all the outgoing edge labels $a_1,\dots,a_n$,
+\[
+p\la{a_1}q_1 \in E \implies p'\la{a_1}q_1' \in E', \quad\dots,\quad p\la{a_n}q_n \in E \implies p'\la{a_n}q_n' \in E',
+\]
+and we have the list of pairs $[(q_1,q_1'), \dots, (q_n,q_n')]$ in the conclusion.
+
+I must admit that the rules for the expansion are not rigorous. There are some ambiguities that require common sense to remove.
+What I really mean in the above definition is
+\[
+\forall p\la{a}q \in E \suchthat p'\la{a}q' \in E',
+\]
+but it cannot be written as a simple series of prepositions, without specifying the range of $a$ in a verbose way.
+I don't want to sacrifice the simplicity for the negligible bit of additional rigor.
+At the end of the day, we can still complement the specification with remarks in the text.
+
+A formally available construct for expandable series is the {\em variadic templates} in {\CPP}~\cite{ISO:2023:n4950}.
+It provides some great ideas for expanding series and pairing variables.
+An exciting feature of this construct is the {\em fold expression} for iteration and accumulation of elements in a series.
+
+\begin{dispCPP}
+template<class... T>
+void print(T... a)
+{
+    (std::cout << ... << a) << std::endl;
+    ((std::cout << ' ' << a), ...) << std::endl;
+}
+
+int main()
+{
+    print('x', 100, true, 99.87);
+    return 0;
+}
+\end{dispCPP}
+
+\endinput

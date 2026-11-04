@@ -1,0 +1,319 @@
+\newglossaryentry{bnchoice}{name={$\bnchoice$}, description={non-deterministic choice}}
+
+\chapter{Pattern Language}\label{ch:language}
+\minitoc
+
+With the detail of the graph model for patterns and layouts fully discussed.
+We give a language extension for pattern matching to general {\OO} languages.
+We then present the type-checking rules and operational semantics, and prove the type safety to reason about the soundness of our model.
+
+\section{Syntax}
+
+\begin{table}[t]
+\caption{Abstract Syntax of Pattern Matching}\label{tab:syntax}
+\centering
+\[
+\begin{array}[t]{ccl@{\quad}l}
+  P &\cceq& [r:] \; (K \orr r \orr V) & \mbox{pattern} \\
+  K &\cceq& T \; \overline{a = P} & \mbox{class pattern} \\
+  r & & & \mbox{pattern reference} \\
+  V & & & \mbox{value set} \\
+  T & & & \mbox{class type} \\
+  a & & & \mbox{attribute} \\
+  J &\cceq& P \orr \bgconj\overline{P} \orr \bgdisj\overline{P} & \mbox{pattern junction} \\
+  M &\cceq& e \; \ltimes \; \overline{J \rightarrow S} & \mbox{match statement} \\
+  S & & & \mbox{statement}
+\end{array}
+\]
+\end{table}
+
+The abstract syntax to define patterns and matches is given in \autoref{tab:syntax}.
+The syntax is much like conventional ones found in other OO and functional languages, with the addition of pattern references.
+The pattern references play two roles, to be referred to from inside the pattern to produce aliases and cycles, and
+to be referred to from the match-selected statement as object bindings --- variables bound to components of matching objects.
+
+A pattern $P$ can have an optional label, which is a pattern reference $r$,
+followed by a pattern specification in one of the three forms ---
+a class pattern, a pattern reference or a set $V$ of values.
+A class pattern $K$ is a class type $T$ followed by zero or more attribute specifications,
+each of which is an attribute name $a$ equal to an inner pattern $P$.
+For example, the pattern $p_4$ shown in \autoref{fig:junction} can be expressed as
+\[
+T_1(b = T_2, c = y: T_3, d = y).
+\]
+The more complex pattern shown in \autoref{fig:obj-pattern} is written as
+\[
+T(l = w: T(l = x: T, r = y: T(l = w, r = z)), r = z: T).
+\]
+A match statement evaluates an expression $e$ and matches the result against many cases in turn.
+Each case consists of a pattern junction $J$, which can be a single pattern,
+a pattern conjunction $\bgconj\overline{P}$ or a pattern disjunction $\bgdisj\overline{P}$,
+and an associated statement $S$.
+The first successfully matched case selects the associated statement to execute,
+with the new object bindings introduced by the references declared in the matched pattern junction.
+
+\section{Pattern Graph Construction}
+
+To carry out the operations of pattern matching and check for its type safety based on the graph model described in \autoref{ch:graph},
+we must first construct the pattern graph for each pattern specified in the abstract syntax.
+The construction is straightforward following the structure of the specification, with three components to output ---
+a layout graph $G$, a map $T$ from nodes to types and a map $R$ from pattern references to nodes.
+\autoref{algo:graph-cons} describes the procedure in detail,
+where, for clarity, we enclose syntax elements in guillemets $\syn{}$ to distinguish them from other variables.
+
+\begin{algorithm}[t]
+\caption{Construction of Pattern Graph}\label{algo:graph-cons}
+\DontPrintSemicolon
+\SetKwFunction{Parse}{parse}
+\KwIn{pattern:~$\syn{P}$.}
+\KwOut{layout graph:~$G$, type~map:~$T$ and reference~map:~$R$.}
+\KwEx{$\SynUndefRef,\SynRedefRef$.}
+\Begin{
+  $N,E,T,R \gets \emptyset$\;
+  $p \gets {}$ \Parse{$\syn{P}$}\;
+  \lIRaise{$\SynUndefRef$}{$\ran(R) \nsubseteq N$}
+  $G \gets \vect{N,E,p}$
+}
+\medskip
+\Fn{\Parse{$\syn{P}$} ${} \to p$}{
+  \uIf{$\syn{P \redto r:Q}$}{
+    $p \gets {}$ \Parse{$\syn{Q}$}\;
+    \If{$\syn{r} \in \dom(R)$}{
+      $r \gets R(\syn{r})$\;
+      \lIRaise{$\SynRedefRef$}{$r \in N$}
+      $E \gets E[p/r], R \gets R[p/r]$\;
+    }
+    $R \gets R \uplus \sett{\syn{r} \mapsto p}$
+  }
+  \uElseIf{$\syn{P \redto T \; \overline{a = Q}}$}{
+    $p \gets \text{new node}$\;
+    $N \gets N \cup \sett{p}$\;
+    $T \gets T \cup \sett{p \mapsto \syn{T}}$\;
+    $\overline{q \gets \mbox{\Parse{$\syn{Q}$}}}$\;
+    $E \gets E \cup \sett{\overline{p\la{\syn{a}}q}}$
+  }
+  \uElseIf{$\syn{P \redto r}$}{
+    \eIf{$\syn{r} \in \dom(R)$}{
+      $p \gets R(\syn{r})$
+    }{
+      $p \gets \text{new node}$\;
+      $R \gets R \cup \sett{\syn{r} \mapsto p}$
+    }
+  }
+  \ElseIf{$\syn{P \redto V}$}{
+    $p \gets \text{new node}$\;
+    $N \gets N \cup \sett{p}$\;
+    $T \gets T \cup \sett{p \mapsto \syn{V}}$
+  }
+}
+\end{algorithm}
+
+In the algorithm, function {\Parse} recursively decomposes a pattern specification $\syn{P}$ into a graph with root $p$
+by updating the nodes $N$, the edges $E$, the type map $T$ and the reference map $R$.
+The {\Parse} function performs case analysis on the pattern specification.
+First, when it is a reference definition $\syn{r:Q}$, we recursively obtain the root $p$ of $\syn{Q}$, and associate it with the reference $\syn{r}$ in $R$.
+It is possible for a reference to be used before definition, we generate a placeholder node $r$ for the forward use, and replace it with the real node at this definition stage.
+A placeholder is not put into the node set $N$, therefore we can check if $r$ is indeed a placeholder, or a node that has defined the reference already.
+For a placeholder $r$, we need to substitute the real node $p$ for it in the edges $E$, for all the source and target nodes equal to $r$,
+and also in the reference map $R$, for all the image nodes equal to $r$. Note that we allow a reference to label another reference.
+Second, when it is a class pattern $\syn{T\;\overline{a=Q}}$, we create a new node $p$ and associate it with type $\syn{T}$.
+We add $p$ to the node set $N$ and link the outgoing edges to the roots recursively obtained from $\overline{\syn{Q}}$, with labels equal to the attribute names $\overline{\syn{a}}$.
+Third, when it is a reference occurrence $\syn{r}$, we try to look up $R$ for its corresponding node, or create a new placeholder without placing it into the node set $N$.
+Last, when it is a value set $\syn{V}$, we simply create a new node and associate it with $\syn{V}$ in the type map $T$.
+
+The graph construction merely creates nodes and links between the nodes. This process is always successful.
+However, with the addition of references, there are two exceptional cases ---
+a reference is defined more than once ($\SynRedefRef$), and a reference occurs but not defined ($\SynUndefRef$).
+The former is detected at the time of parsing a label prefix, while the latter is detected when the parsing is complete,
+by checking whether all the placeholders have been resolved.
+
+\section{Type-Checking}
+
+\begin{table}[t]
+\caption{Type-Checking Rules}\label{tab:tc}
+\centering
+\normalsize
+\begin{mathpar}
+\inferrulel[(Node)]
+  {\Env \vdash t = T(p) \\ \overline{p\la{a}q \in E} \\ p:t,\Env \xt E,T \vdash \overline{q:s} \\
+   \Env \vdash \overline{t.a:s' \wedge s \subty s'}\Olf{2}}
+  {\Env \xt E,T \vdash p:t}
+\and
+\inferrulel[(Graph)]
+  {P = \vect{N,E,p,T} \\ \Env \xt E,T \vdash p:t}
+  {\Env \vdash P:t}
+\and
+\inferrulel[(Ref)]
+  {R(r) = p \\ P = \vect{N,E,p,T} \\ \Env; E,T \vdash p:t}
+  {\Env \xt P,R \vdash r:t}
+\and
+\inferrulel[(Pattern)]
+  {\mbox{\autoref{algo:graph-cons}}: \syn{P} \to G,T,R \\
+   P = \vect{G,T} \\ \Env \vdash P:t \\
+   \overline{r} = \dom(R) \\ \Env \xt P,R \vdash \overline{r:s}}
+  {\Env \vdash \syn{P}:t,\overline{r:s} \xt P,R}
+\and
+\inferrulel[(Conj)]
+  {\Env \vdash \overline{\syn{P}:t, \overline{r:s} \xt P,R} \\
+   \mbox{\autoref{algo:conj-dfs-cons}}:\Env,\overline{P} \to \overline{f},\co{T} \\
+   \overline{s' = \min(s,\co{T}(f(R(r))))} \\ \hat{t} = \co{T}(f_1(R_1(\Root(P_1)))) \\ \overline{t' = \min(t,\hat{t})}}
+  {\Env \vdash \syn{\bgconj\overline{P}}:\hat{t},\overline{\syn{P}:t'},\overline{r:s'} \xt \overline{P},\overline{f},\overline{R}}
+\and
+\inferrulel[(Disj)]
+  {\Env \vdash \overline{\syn{P}:t,\overline{r:s} \xt P,R} \\
+   \mbox{\autoref{algo:disj-dfs-cons}}:\Env,\overline{P} \to \overline{f},\ov{T} \\
+   \overline{s' = \ov{T}(f(R(r)))} \\ \hat{t} = \ov{T}(f_1(R_1(\Root(P_1)))}
+  {\Env \vdash \syn{\bgdisj\overline{P}}:\hat{t},\overline{\syn{P}:t},\overline{r:s'} \xt \overline{P},\overline{f},\overline{R}}
+\and
+\inferrulel[(Case)]
+  {\Env \vdash \syn{J}:t,\overline{r:s} \xt \overline{P},\overline{f},\overline{R} \\
+   \overline{r:s},\Env \vdash \syn{S}}
+  {\Env \vdash \syn{J \to S}: t}
+\and
+\inferrulel[(Match)]
+  {\Env \vdash \overline{\syn{J \to S}: t} \\
+   \Env \vdash e: t' \\ \Env \vdash \overline{t' \subty t \vee t \subty t'}}
+  {\Env \vdash \syn{e \ltimes \overline{J \to S}}}
+\end{mathpar}
+\end{table}
+
+The pattern matching extension is type-checked in two parts, the pattern and the match.
+A pattern can be a class pattern, a reference, a pattern conjunction or a pattern disjunction.
+A class pattern is converted to a pattern graph and checked by recursively reducing to each node and the outgoing edges.
+A node in a pattern graph is well-typed when all its outgoing edges are labeled with the attributes of the associated class,
+and also the targets are all well-typed.
+To avoid infinite loops in the {\DFS}, we add the visited nodes to the typing environment before going into recursion.
+A reference is checked by resolving it to a node with the reference map.
+A class pattern is well-typed only when the corresponding pattern graph and all the references declared in the pattern are well-typed.
+
+The type-checking rules are given in \autoref{tab:tc}.
+Each typing rule involves a typing environment $\Env$ and optionally some additional structures, separated by a semicolon, as the context.
+The result of a rule is the well-typedness and type-assignment of the checked element, possibly with some extra output, also separated by a semicolon, during the checking.
+This output can be necessary in the subsequent procedures.
+
+For a pattern conjunction, we check the individual patterns first, and try to construct the match conjunction.
+Then, we promote the type of each referenced node to the infimum type associated with the union.
+If such infimum type does not exist, we fall back to the original type of the node.
+For a pattern disjunction, we try to construct the match disjunction.
+Only a referenced node that occurs commonly in all the component patterns has a type, which must be the supremum type associated with the intersection.
+If such supremum type does not exist, the referenced node has $\NoType$, and subsequent uses of the reference will be ill-typed.
+This includes the case where a referenced node does not occur in all the component patterns.
+
+A match is a test of an expression against multiple cases.
+Therefore, to type-check a match, we need to check the individual cases, and whether the expression is type-compatible with all the cases.
+Each case consists of a pattern and a statement.
+The checking of the pattern produces the type of the pattern and a series of type-assigned references, as the additional variables available to the statement.
+We check the type of the pattern against the expression to match, and check the statement under the context with those additional variables declared.
+
+\section{Operational Semantics}
+
+\begin{table}[t]
+\caption{State Transition Rules}\label{tab:st}
+\centering
+\normalsize
+\begin{mathpar}
+\inferrulel[(Match)]
+  {\eval(\syn{e}) = p \\ P = \Sta \rrt p}
+  {\vect{\syn{e \ltimes \overline{J \to S}}, \Sta} \to \vect{P \ltimes \syn{\overline{J \to S}}, \Sta}}
+\and
+\inferrulel[(Match-None)]
+  {}
+  {\vect{P \ltimes \syn{\emptyset}, \Sta} \to \Sta}
+\and
+\inferrulel[(Match-Some)]
+  {\syn{\overline{J \to S}} = \syn{J_1 \to S_1, \overline{J' \to S'}} \\ \Env \vdash \syn{J_1} \xt \overline{P_1},\overline{f_1},\overline{R_1}}
+  {\inferrule
+    {\mb(P,\syn{J_1},\overline{P_1},\overline{f_1},\overline{R_1}) = (\overline{r},\overline{q})}
+    {\vect{P \ltimes \syn{\overline{J \to S}}, \Sta} \to \vect{\syn{\Var(\overline{r=q});S;\EndV(\overline{r})}, \Sta}} \\
+   \inferrule
+    {\mb(P,\syn{J_1},\overline{P_1},\overline{f_1},\overline{R_1}) = \emptyset}
+    {\vect{P \ltimes \syn{\overline{J \to S}}, \Sta} \to \vect{P \ltimes \syn{\overline{J' \to S'}}, \Sta}}}
+\end{mathpar}
+
+\begin{mathpar}
+\mb(P,\syn{J_1},\overline{P_1},\overline{f_1},\overline{R_1}) \qdef
+\hfill\and
+\inferrulel[(Match-One)]
+  {\syn{J_1} = \syn{P} \\ \Env \vdash P \gmat[f] P_1}
+  {\overline{r} = \dom(R_1) \\ \overline{q = f(R_1(r))}}
+\and
+\inferrulel[(Match-Conj)]
+  {\syn{J_1} = \syn{\bgconj\overline{P}} \\ \Env \vdash \overline{P \gmat[f] P_1} \\
+   R' = \bgunion\overline{R_1} \\ f' = \bgunion\overline{f}}
+  {\overline{r} = \dom(R') \\ \overline{q = f'(R'(r))}}
+\and
+\inferrule[(Match-Disj)]
+  {\syn{J_1} = \syn{\bgdisj\overline{P}} \\ \Env \vdash \exists P' \in \overline{P_1} \suchthat P \gmat[f] P' \\
+   R' = \bgunion\overline{R_1} \\ f_1' = \bgunion\overline{f_1} \\ \overline{\ov{u} = f_1'(R'(r))}\Olf{2}}
+  {\overline{r} = \dom(R') \\ \overline{q = \mgls{bnchoice}\sett{f(u) \mid f_1'(u) = \ov{u}}}}
+\and
+\inferrulel[(Mismatch)]
+  {\mbox{otherwise}}
+  {\emptyset}
+\end{mathpar}
+\end{table}
+
+The operation of a pattern match statement is to evaluate the expression,
+then to match the result against the list of cases in turn,
+and finally to select the statement in the matched case to execute.
+In the graph model, the expression $\syn{e}$ to match is evaluated to a node in the state graph,
+and then the pattern graph $P$ rooted at this node is extracted from the state graph.
+The pattern graph is matched in turn against all the cases until a matched case is found,
+otherwise there is no statement to execute in this match.
+
+The operational semantics is given by the state transition rules listed in \autoref{tab:st}.
+Before we can match the pattern graph of the expression,
+we need to obtained the pattern graphs of the patterns by taking the output of the type-checking procedures.
+Beside to match by constructing the match morphisms, we also need to obtain the references declared in the patterns, as well as their corresponding nodes.
+This task is done in the $\mb$ function, divided into three cases, a single pattern, a conjunction, or a disjunction.
+For a single pattern, a reference $r$ is mapped to a node of the pattern graph $P_1$ by the reference map $R_1$,
+then we can use the match morphism $f$ from the pattern graph to the expression graph $P$ to obtain the corresponding node in the state graph.
+For a conjunction, since the match of the expression graph must be done against all the component pattern graphs,
+we have a series of match morphisms from different pattern graphs to the same expression graph, their domains do not intersect with each other.
+We can simply union these morphisms into one to obtain the nodes of the references.
+
+A disjunction is more complicated, because there requires only one match of the component pattern graphs,
+and a node in the intersection is possibly de-aliased to two or more nodes in a component pattern.
+We have restricted the references in a disjunction only to those nodes in the intersection, by assigning $\NoType$ to the other nodes.
+Therefore, we are left with a one-to-many mapping from the intersection to the matched pattern, and thus to the expression graph.
+We use the non-deterministic choice $\nchoice$ to bind a reference to one of the possible corresponding nodes in the state graph.
+Note that, in function $\mb$, $f_1'$ is the union of the morphisms from the patterns to their intersection.
+Once we have the bindings of the references to the nodes in the state graph,
+we can declare the additional variables as a normal variable declaration, $\Var\ldots\EndV$, and execute the statement of the matched case in this scope.
+
+\section{Type Safety}
+
+The type safety of pattern matching means a well-typed pattern match statement cannot go wrong at runtime.
+Since the only new operation introduced by pattern matching is the new bindings of pattern references to runtime objects,
+the statement of the matched case is type-safe when the runtime objects truly have the types associated with the nodes of the matched pattern.
+
+\begin{Theorem}\label{thm:typesafe}
+For the same pattern junction $\syn{J}$,
+let $(\overline{r},\overline{q})$ be the result of function $\mb$ in \autoref{tab:st},
+$\overline{r:s}$ the type assignment obtained by ({\sc Case}) in \autoref{tab:tc}.
+We have $\overline{\atype(q) \subty s}$.
+\end{Theorem}
+\begin{proof}
+We study the type $t$ of the node $q$ associated to a reference $r$ in function $\mb$ by case analysis.
+In the case of ({\sc Match-One}), $t$ comes from the type assignment of pattern graph $P$.
+By the definition of $\gmat[f]$, $t \subty s$, where $s$ is the type of node $R_1(r)$ in pattern graph $P_1$, such that $q = f(R_1(r))$.
+In fact, in ({\sc Match-Some}), $P_1$ and $R_1$ are obtained from the type-checking rules.
+According to ({\sc Pattern}), ({\sc Graph}) and ({\sc Node}), $s$ is exactly the type assigned to $r$ in the type-checking.
+
+Similarly, in the case of ({\sc Match-Conj}), $P$ matches all $\overline{P_1}$.
+The type $t$ of $q$ is a subtype of all the types $\overline{t_k}$ of the corresponding nodes in each of $\overline{P_1}$.
+By \autoref{algo:conj-dfs-cons}, if there exists $\inf(\overline{t_k})$, it is assigned to $r$ in ({\sc Conj}),
+for $\inf(\overline{t_k})$ is a subtype of each $\overline{t_k}$, and $t$ must be a subtype of the infimum by definition.
+It there exists no infimum, $\NoType$ is assigned to the node in the union,
+thus the $\overline{\min(\NoType,t_k)}$ in ({\sc Conj}) assigns $r$ with one of $\overline{t_k}$, of which $t$ is a subtype.
+
+In the case of ({\sc Match-Disj}), $P$ matches only one graph $P'$ of $\overline{P_1}$.
+The node $q$ bound to $r$ is non-deterministically chosen from nodes $\overline{f(u)}$ in $P$,
+matching those nodes $\overline{u}$ in $P'$ that are finally mapped to the same node $\ov{u}$ in the intersection of $\overline{P_1}$.
+The type $t$ of $q$ is a subtype of the corresponding node in $P'$ mapped to $\ov{u}$.
+By \autoref{algo:disj-dfs-cons} and ({\sc Disj}), $r$ is assigned with the supremum type of all the node in $\overline{P_1}$ mapped to $\ov{u}$,
+or $\NoType$ if the supremum does not exist.
+Obviously, in either case, $t$ is a subtype of the type assigned to $r$.
+\end{proof}
+
+\endinput
